@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Steady Path</title>
+  <meta name="theme-color" content="#0f1728">
+  <meta name="description" content="A strict-but-stabilizing accountability app for disciplined execution, recovery, and grounded living.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23172235'/%3E%3Cstop offset='100%25' stop-color='%230b1321'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M13 49h38' stroke='%238cb3ff' stroke-width='2.6' stroke-linecap='round' opacity='.8'/%3E%3Ctext x='32' y='38' text-anchor='middle' fill='%23edf2fb' font-family='Georgia, serif' font-size='24' font-weight='700'%3ESP%3C/text%3E%3C/svg%3E">
+  <script src="./app-config.js"></script>
+  <style>
+    :root {
+      --bg: #09111c;
+      --bg-2: #111b2a;
+      --surface: rgba(20, 29, 44, 0.9);
+      --surface-2: rgba(29, 39, 60, 0.95);
+      --surface-3: rgba(13, 20, 34, 0.96);
+      --surface-glass: rgba(20, 29, 44, 0.76);
+      --text: #eef3fb;
+      --text-soft: #b3bfd2;
+      --text-muted: #8994a7;
+      --line: rgba(255, 255, 255, 0.1);
+      --line-2: rgba(255, 255, 255, 0.06);
+      --blue: #8eb5ff;
+      --blue-2: #6988cf;
+      --blue-soft: rgba(142, 181, 255, 0.18);
+      --green: #89d5ba;
+      --amber: #f0bf7f;
+      --red: #f39eab;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --max: 1480px;
+    }
+
+    body.theme-light {
+      --bg: #f3efe7;
+      --bg-2: #ebe6dd;
+      --surface: rgba(255, 252, 248, 0.9);
+      --surface-2: rgba(255, 255, 255, 0.96);
+      --surface-3: rgba(248, 244, 238, 0.98);
+      --surface-glass: rgba(255, 255, 255, 0.74);
+      --text: #192330;
+      --text-soft: #566172;
+      --text-muted: #788393;
+      --line: rgba(25, 35, 48, 0.12);
+      --line-2: rgba(25, 35, 48, 0.08);
+      --blue: #5f86dc;
+      --blue-2: #7ca0ef;
+      --blue-soft: rgba(95, 134, 220, 0.14);
+      --green: #2f8769;
+      --amber: #b67b2d;
+      --red: #b65268;
+      --shadow: 0 24px 60px rgba(30, 35, 45, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      font-family: "Manrope", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top center, rgba(105, 141, 215, 0.16), transparent 26%),
+        linear-gradient(180deg, #141b29 0%, var(--bg) 24%, #08111a 100%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body.theme-light {
+      background:
+        radial-gradient(circle at top center, rgba(95, 134, 220, 0.16), transparent 26%),
+        linear-gradient(180deg, #f6f1e9 0%, var(--bg) 24%, #f1ede5 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+
+    .shell {
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 18px 18px 0;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(9, 17, 28, 0.94), rgba(9, 17, 28, 0.58) 72%, transparent);
+    }
+
+    body.theme-light .topbar {
+      background: linear-gradient(180deg, rgba(243, 239, 231, 0.94), rgba(243, 239, 231, 0.58) 72%, transparent);
+    }
+
+    .topbar-inner {
+      max-width: calc(var(--max) + 24px);
+      margin: 0 auto;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface-glass);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px) saturate(140%);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 220px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top left, rgba(142, 181, 255, 0.3), transparent 42%),
+        linear-gradient(180deg, rgba(32, 44, 67, 0.96), rgba(18, 27, 42, 0.96));
+      border: 1px solid var(--line);
+      color: #f7fbff;
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.28rem;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    body.theme-light .brand-mark {
+      background:
+        radial-gradient(circle at top left, rgba(95, 134, 220, 0.18), transparent 42%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(242, 238, 231, 0.98));
+      color: #21304a;
+    }
+
+    .brand-copy { min-width: 0; }
+    .brand-kicker {
+      margin-bottom: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+
+    .brand-title {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.62rem;
+      line-height: 0.96;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .nav-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      flex: 1;
+      scrollbar-width: none;
+    }
+
+    .nav-strip::-webkit-scrollbar { display: none; }
+
+    .nav-pill {
+      flex: 0 0 auto;
+      padding: 15px 24px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-soft);
+      font-size: 0.92rem;
+      font-weight: 800;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    body.theme-light .nav-pill {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .nav-pill.active {
+      border-color: transparent;
+      color: white;
+      background: linear-gradient(180deg, var(--blue), var(--blue-2));
+      box-shadow: 0 12px 24px rgba(105, 136, 207, 0.28);
+    }
+
+    .action-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .theme-toggle, .ghost-btn, .primary-btn, .pill-btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    .theme-toggle {
+      padding: 15px 24px;
+      font-weight: 800;
+    }
+
+    .ghost-btn, .primary-btn, .pill-btn {
+      padding: 12px 18px;
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      border-color: transparent;
+      color: #1e2d46;
+      background: linear-gradient(180deg, #eef4ff, #dbe7ff);
+    }
+
+    body.theme-light .primary-btn {
+      color: white;
+      background: linear-gradient(180deg, #5c85db, #7ca0ef);
+    }
+
+    .pill-btn.active {
+      background: var(--blue-soft);
+      color: var(--text);
+      border-color: rgba(142, 181, 255, 0.36);
+    }
+
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 22px 20px 48px;
+    }
+
+    .banner-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .banner {
+      border-radius: 22px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      background: rgba(31, 42, 63, 0.9);
+      box-shadow: var(--shadow);
+    }
+
+    body.theme-light .banner {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .banner strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+
+    .page-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 22px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .main-stack, .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .side-stack {
+      position: sticky;
+      top: 118px;
+    }
+
+    .panel {
+      border-radius: 32px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at top right, rgba(142, 181, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(24, 33, 49, 0.98), rgba(17, 26, 40, 0.98));
+      padding: 28px;
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    body.theme-light .panel {
+      background:
+        radial-gradient(circle at top right, rgba(95, 134, 220, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(248, 245, 239, 0.98));
+    }
+
+    .hero-panel {
+      padding: 36px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--blue);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 72px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(142, 181, 255, 0.84), rgba(142, 181, 255, 0));
+    }
+
+    h1, h2, h3, h4 {
+      margin: 0;
+      font-family: "Fraunces", Georgia, serif;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+    }
+
+    .hero-title {
+      margin-top: 26px;
+      max-width: 10ch;
+      font-size: clamp(3rem, 5vw, 5.6rem);
+    }
+
+    .hero-copy {
+      margin-top: 18px;
+      max-width: 35ch;
+      color: var(--text-soft);
+      line-height: 1.78;
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 26px;
+    }
+
+    .stat-card, .soft-card, .task-row, .proof-card, .guide-card, .auth-card, .setup-card, .mission-card {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(14, 20, 31, 0.5);
+      padding: 20px;
+      min-width: 0;
+    }
+
+    body.theme-light .stat-card,
+    body.theme-light .soft-card,
+    body.theme-light .task-row,
+    body.theme-light .proof-card,
+    body.theme-light .guide-card,
+    body.theme-light .auth-card,
+    body.theme-light .setup-card,
+    body.theme-light .mission-card {
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .stat-label, .section-label, .sub-label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .stat-copy {
+      color: var(--text-soft);
+      line-height: 1.6;
+      font-size: 0.97rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .page-tab {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-soft);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .page-tab.active {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(180deg, var(--blue), var(--blue-2));
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+      min-width: 0;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .section-copy {
+      color: var(--text-soft);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+      min-width: 0;
+    }
+
+    .field-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-soft);
+      text-transform: uppercase;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"], input[type="time"], input[type="url"], textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 14px 15px;
+      outline: none;
+    }
+
+    body.theme-light input[type="text"],
+    body.theme-light input[type="email"],
+    body.theme-light input[type="password"],
+    body.theme-light input[type="time"],
+    body.theme-light input[type="url"],
+    body.theme-light textarea,
+    body.theme-light select {
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    textarea {
+      min-height: 108px;
+      resize: vertical;
+    }
+
+    .task-list, .trigger-grid, .choice-row, .guide-grid, .proof-list, .history-list, .trend-grid {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .task-list { grid-template-columns: 1fr; }
+    .trigger-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .choice-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .trend-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+    .task-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .task-info {
+      min-width: 0;
+    }
+
+    .task-info strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .task-info span {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .toggle {
+      min-width: 96px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-soft);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .toggle.active {
+      color: #17304b;
+      border-color: transparent;
+      background: linear-gradient(180deg, #eef4ff, #dbe7ff);
+    }
+
+    body.theme-light .toggle.active {
+      color: white;
+      background: linear-gradient(180deg, #5e86dc, #7ca0ef);
+    }
+
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-soft);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip.selected {
+      color: white;
+      border-color: transparent;
+      background: linear-gradient(180deg, rgba(243, 158, 171, 0.95), rgba(206, 102, 125, 0.95));
+    }
+
+    .chip.secondary.selected {
+      background: linear-gradient(180deg, rgba(142, 181, 255, 0.95), rgba(105, 136, 207, 0.95));
+    }
+
+    .score-band {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .metric-card {
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background: rgba(14, 20, 31, 0.5);
+      padding: 18px;
+    }
+
+    body.theme-light .metric-card {
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      margin: 10px 0 6px;
+    }
+
+    .metric-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(142, 181, 255, 0.12);
+      color: var(--blue);
+      font-size: 0.86rem;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .guide-card p, .history-item p, .proof-item p, .setup-copy, .auth-copy {
+      color: var(--text-soft);
+      line-height: 1.72;
+      margin: 0;
+    }
+
+    .mark {
+      font-weight: 800;
+      color: var(--text);
+      padding: 0 1px;
+      border-radius: 4px;
+      background: linear-gradient(180deg, transparent 42%, rgba(142, 181, 255, 0.3) 42%);
+    }
+
+    body.theme-light .mark {
+      background: linear-gradient(180deg, transparent 42%, rgba(95, 134, 220, 0.2) 42%);
+    }
+
+    .line-mark {
+      font-weight: 800;
+      text-decoration-line: underline;
+      text-decoration-color: rgba(137, 213, 186, 0.58);
+      text-decoration-thickness: 0.15em;
+      text-underline-offset: 0.12em;
+    }
+
+    .proof-item, .history-item {
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(14, 20, 31, 0.44);
+      padding: 16px;
+    }
+
+    body.theme-light .proof-item,
+    body.theme-light .history-item {
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .history-item strong, .proof-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .auth-shell, .setup-shell {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 72px 20px;
+    }
+
+    .auth-card, .setup-card {
+      background:
+        radial-gradient(circle at top right, rgba(142, 181, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(24, 33, 49, 0.98), rgba(17, 26, 40, 0.98));
+      border-radius: 32px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    body.theme-light .auth-card,
+    body.theme-light .setup-card {
+      background:
+        radial-gradient(circle at top right, rgba(95, 134, 220, 0.08), transparent 28%),
+        linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(248, 245, 239, 0.98));
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+      line-height: 1.7;
+    }
+
+    .inline-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .danger {
+      color: var(--red);
+    }
+
+    .success {
+      color: var(--green);
+    }
+
+    .muted {
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 1180px) {
+      .page-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .side-stack {
+        position: static;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .topbar-inner {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        padding: 16px;
+      }
+
+      .nav-strip { display: none; }
+      .page, .topbar { padding-left: 12px; padding-right: 12px; }
+      .dashboard-grid,
+      .field-grid,
+      .guide-grid,
+      .choice-row,
+      .score-band,
+      .trend-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .trigger-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero-panel,
+      .panel,
+      .auth-card,
+      .setup-card {
+        padding: 22px;
+        border-radius: 28px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .brand-title {
+        font-size: 1.36rem;
+      }
+
+      .hero-title {
+        font-size: clamp(2.4rem, 12vw, 3.8rem);
+      }
+
+      .trigger-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .task-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+    import React from "https://esm.sh/react@18.3.1";
+    import { createRoot } from "https://esm.sh/react-dom@18.3.1/client";
+    import htm from "https://esm.sh/htm@3.1.1";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const html = htm.bind(React.createElement);
+    const { useEffect, useMemo, useRef, useState } = React;
+
+    const CONFIG = window.STEADY_PATH_CONFIG || null;
+    const supabase = CONFIG?.supabaseUrl && CONFIG?.supabaseAnonKey
+      ? createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey)
+      : null;
+
+    const DRIFT_TRIGGERS = [
+      { key: "porn", label: "Porn" },
+      { key: "doom_scrolling", label: "Doom scrolling" },
+      { key: "fantasy_loop", label: "Fantasy loop" },
+      { key: "youtube_binge", label: "YouTube binge" },
+      { key: "music_escape", label: "Music escape" },
+      { key: "oversleeping", label: "Oversleeping" }
+    ];
+
+    const RECOVERY_ACTIONS = [
+      "Put phone away",
+      "10 pushups",
+      "5 min breathing",
+      "15 min focused task",
+      "Silence mode",
+      "Cold water splash",
+      "Walk without headphones"
+    ];
+
+    const GUIDE_SECTIONS = [
+      {
+        title: "Reality Check",
+        copy: "You are not lacking [[talent]] or [[potential]]. The real leak is [[scattered energy]], ((overstimulation)), and [[inconsistent action]]."
+      },
+      {
+        title: "Enemies",
+        copy: "Track the exact triggers that pull you out of reality. Drift becomes beatable when it stops being vague."
+      },
+      {
+        title: "Mantras",
+        copy: "[[Execution over emotion.]] [[Finish before you escape.]] [[Silence builds power.]]"
+      },
+      {
+        title: "Identity",
+        copy: "A builder [[shows up]], [[finishes]], and [[repeats]]. This app exists to make that visible every day."
+      }
+    ];
+
+    const DAY_RULES = {
+      monday: {
+        title: "Monday grounding",
+        colorToWear: "White or light colors",
+        mantra: "Om Som Somaya Namah",
+        deityOrPrayer: "Pray to Shiva",
+        fastingRecommended: true,
+        avoidNonVeg: true,
+        offeringNotes: [],
+        avoidNotes: ["Anger", "Overstimulation", "Doom scrolling"],
+        focusNotes: ["Emotional calmness", "Hydration", "Gentle discipline"]
+      },
+      tuesday: {
+        title: "Tuesday action",
+        colorToWear: "Simple red",
+        mantra: "Hanuman Chalisa or Om Hanumate Namah",
+        deityOrPrayer: "Pray to Hanuman",
+        fastingRecommended: false,
+        avoidNonVeg: false,
+        offeringNotes: [],
+        avoidNotes: ["Excuses", "Wasted energy", "Weak starts"],
+        focusNotes: ["Hard tasks first", "Action without delay", "Physical intensity"]
+      },
+      wednesday: {
+        title: "Wednesday clarity",
+        colorToWear: "Green or light green",
+        mantra: "Om Bum Budhaya Namah",
+        deityOrPrayer: "Pray for clarity and focus",
+        fastingRecommended: false,
+        avoidNonVeg: false,
+        offeringNotes: [],
+        avoidNotes: ["Scattered work", "Gossip", "Messy workspace"],
+        focusNotes: ["Organization", "Deep study", "Focused communication"]
+      },
+      thursday: {
+        title: "Thursday stability",
+        colorToWear: "Soft yellow or cream",
+        mantra: "Keep prayer simple and grounding",
+        deityOrPrayer: "Focus on gratitude and humility",
+        fastingRecommended: false,
+        avoidNonVeg: false,
+        offeringNotes: [],
+        avoidNotes: ["Intellectual arrogance", "Talking more than doing"],
+        focusNotes: ["Wisdom", "Teaching yourself clearly", "Structure"]
+      },
+      friday: {
+        title: "Friday softness",
+        colorToWear: "Clean light clothes",
+        mantra: "Keep the mind calm and grateful",
+        deityOrPrayer: "Simple prayer for peace",
+        fastingRecommended: false,
+        avoidNonVeg: false,
+        offeringNotes: [],
+        avoidNotes: ["Overindulgence", "Late-night stimulation"],
+        focusNotes: ["Balance", "Emotional steadiness", "Clean habits"]
+      },
+      saturday: {
+        title: "Saturday discipline",
+        colorToWear: "Simple dark blue",
+        mantra: "Om Sham Shanishcharaya Namah",
+        deityOrPrayer: "Pray with humility and correction in mind",
+        fastingRecommended: true,
+        avoidNonVeg: true,
+        offeringNotes: ["Black sesame", "Mustard oil", "Feed dogs/crows if possible"],
+        avoidNotes: ["Arrogance", "Laziness", "Ego reactions"],
+        focusNotes: ["Humility", "Deep cleaning", "Focused work"]
+      },
+      sunday: {
+        title: "Sunday reset",
+        colorToWear: "Clean and simple",
+        mantra: "Keep prayer light and sincere",
+        deityOrPrayer: "Use the day for inner order",
+        fastingRecommended: false,
+        avoidNonVeg: false,
+        offeringNotes: [],
+        avoidNotes: ["Mindless consumption", "Chaotic planning"],
+        focusNotes: ["Review", "Reset", "Prepare the next week"]
+      }
+    };
+
+    function isoDateForTimezone(timezone, date = new Date()) {
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: timezone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(date);
+    }
+
+    function weekdayForTimezone(timezone, date = new Date()) {
+      return new Intl.DateTimeFormat("en-US", {
+        timeZone: timezone,
+        weekday: "long"
+      }).format(date).toLowerCase();
+    }
+
+    function displayDateForTimezone(timezone, date = new Date()) {
+      return new Intl.DateTimeFormat("en-IN", {
+        timeZone: timezone,
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      }).format(date);
+    }
+
+    function parseIsoDate(dateString) {
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+
+    function formatIsoDate(date) {
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+      const day = String(date.getUTCDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function addUtcDays(dateString, amount) {
+      const date = parseIsoDate(dateString);
+      date.setUTCDate(date.getUTCDate() + amount);
+      return formatIsoDate(date);
+    }
+
+    function startOfWeekIso(dateString) {
+      const date = parseIsoDate(dateString);
+      const weekday = date.getUTCDay();
+      const offset = weekday === 0 ? -6 : 1 - weekday;
+      date.setUTCDate(date.getUTCDate() + offset);
+      return formatIsoDate(date);
+    }
+
+    function safeTimeCompare(timeValue, threshold) {
+      if (!timeValue) return false;
+      return timeValue <= threshold;
+    }
+
+    function computeSleepQualified(entry) {
+      return safeTimeCompare(entry.sleep_time || "", "23:30");
+    }
+
+    function computeMinimumDay(entry) {
+      return Boolean(
+        entry.minimum_build_completed &&
+        entry.minimum_pushups_completed &&
+        entry.minimum_no_porn_completed &&
+        safeTimeCompare(entry.sleep_time || "", "24:00")
+      );
+    }
+
+    function computeFullDay(entry) {
+      return Boolean(
+        entry.big_goal_completed &&
+        entry.study_build_completed &&
+        entry.exercise_completed &&
+        computeSleepQualified(entry)
+      );
+    }
+
+    function computeNoZeroDay(entry, proofCount) {
+      return Boolean(
+        proofCount > 0 ||
+        entry.minimum_build_completed ||
+        entry.study_build_completed ||
+        entry.exercise_completed ||
+        computeMinimumDay(entry)
+      );
+    }
+
+    function computeRealityScore(entry, driftCount, proofCount) {
+      let score = 0;
+      if (entry.big_goal_completed) score += 25;
+      if (entry.study_build_completed) score += 20;
+      if (entry.exercise_completed) score += 20;
+      if (computeSleepQualified(entry)) score += 15;
+      if ((entry.silent_time_minutes || 0) >= 20) score += 10;
+      if (proofCount > 0) score += 10;
+      score -= driftCount * 6;
+      if (entry.fantasy_detection_answer === "yes") score -= 10;
+      if (entry.fantasy_detection_answer === "a_little") score -= 4;
+      return Math.max(0, Math.min(100, score));
+    }
+
+    function rich(text) {
+      const parts = text.split(/(\[\[.*?\]\]|\(\(.*?\)\))/g).filter(Boolean);
+      return parts.map((part, index) => {
+        if (part.startsWith("[[") && part.endsWith("]]")) {
+          return html`<span key=${index} className="mark">${part.slice(2, -2)}</span>`;
+        }
+        if (part.startsWith("((") && part.endsWith("))")) {
+          return html`<span key=${index} className="line-mark">${part.slice(2, -2)}</span>`;
+        }
+        return html`<span key=${index}>${part}</span>`;
+      });
+    }
+
+    function getTodayState(entry, proofsCount, driftCount) {
+      const full = computeFullDay(entry);
+        const min = computeMinimumDay(entry) || entry.minimum_viable_day_completed;
+      const noZero = computeNoZeroDay(entry, proofsCount);
+      if (full) {
+        return {
+          full,
+          min,
+          noZero,
+          sleepQualified: computeSleepQualified(entry),
+          realityScore: computeRealityScore(entry, driftCount, proofsCount),
+          status: "full_success"
+        };
+      }
+      if (min || noZero) {
+        return {
+          full,
+          min,
+          noZero,
+          sleepQualified: computeSleepQualified(entry),
+          realityScore: computeRealityScore(entry, driftCount, proofsCount),
+          status: "minimum_day"
+        };
+      }
+      return {
+        full,
+        min,
+        noZero,
+        sleepQualified: computeSleepQualified(entry),
+        realityScore: computeRealityScore(entry, driftCount, proofsCount),
+        status: "miss"
+      };
+    }
+
+    async function ensureProfile(user) {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        display_name: user.user_metadata?.display_name || user.email?.split("@")[0] || "User",
+        timezone
+      });
+      await supabase.from("streak_state").upsert({
+        user_id: user.id,
+        weekly_grace_available: true,
+        weekly_grace_last_reset_date: isoDateForTimezone(timezone)
+      });
+      await supabase.from("reminder_preferences").upsert({
+        user_id: user.id
+      });
+    }
+
+    function App() {
+      const [theme, setTheme] = useState(() => window.localStorage.getItem("steady-path-theme") || "dark");
+      const [session, setSession] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [bootError, setBootError] = useState("");
+      const [authMode, setAuthMode] = useState("signin");
+      const [authEmail, setAuthEmail] = useState("");
+      const [authPassword, setAuthPassword] = useState("");
+      const [authMessage, setAuthMessage] = useState("");
+      const [activePage, setActivePage] = useState("today");
+      const [profile, setProfile] = useState(null);
+      const [entry, setEntry] = useState(null);
+      const [proofs, setProofs] = useState([]);
+      const [history, setHistory] = useState([]);
+      const [driftLogs, setDriftLogs] = useState([]);
+      const [driftHistory, setDriftHistory] = useState([]);
+      const [selectedDrifts, setSelectedDrifts] = useState(new Set());
+      const [streak, setStreak] = useState(null);
+      const [reminders, setReminders] = useState(null);
+      const [saveState, setSaveState] = useState("idle");
+      const [bannerMessage, setBannerMessage] = useState("");
+      const [proofType, setProofType] = useState("note");
+      const [proofText, setProofText] = useState("");
+      const [proofUrl, setProofUrl] = useState("");
+      const [proofFile, setProofFile] = useState(null);
+      const reminderIntervalRef = useRef(null);
+
+      useEffect(() => {
+        document.body.classList.toggle("theme-light", theme === "light");
+        window.localStorage.setItem("steady-path-theme", theme);
+      }, [theme]);
+
+      useEffect(() => {
+        if (!supabase) {
+          setLoading(false);
+          return;
+        }
+
+        let mounted = true;
+
+        supabase.auth.getSession().then(({ data, error }) => {
+          if (!mounted) return;
+          if (error) setBootError(error.message);
+          setSession(data.session || null);
+          setLoading(false);
+        });
+
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+          setSession(nextSession);
+        });
+
+        return () => {
+          mounted = false;
+          listener.subscription.unsubscribe();
+        };
+      }, []);
+
+      useEffect(() => {
+        if (!session?.user || !supabase) return;
+
+        let cancelled = false;
+
+        const load = async () => {
+          try {
+            setLoading(true);
+            await ensureProfile(session.user);
+            const { data: profileRow } = await supabase
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+            if (cancelled) return;
+            setProfile(profileRow);
+
+            const timezone = profileRow?.timezone || "Asia/Kolkata";
+            const today = isoDateForTimezone(timezone);
+
+            const { data: existingEntry } = await supabase
+              .from("daily_entries")
+              .select("*")
+              .eq("user_id", session.user.id)
+              .eq("date", today)
+              .maybeSingle();
+
+            let currentEntry = existingEntry;
+            if (!currentEntry) {
+              const seed = {
+                user_id: session.user.id,
+                date: today,
+                big_goal_text: "",
+                big_goal_completed: false,
+                study_build_completed: false,
+                exercise_completed: false,
+                sleep_time: null,
+                wake_time: null,
+                sleep_qualified: false,
+                silent_time_minutes: 0,
+                walk_without_headphones_completed: false,
+                fantasy_detection_answer: "a_little",
+                recovery_mode_used: false,
+                recovery_action_key: null,
+                proof_submitted: false,
+                reality_score: 0,
+                minimum_viable_day_completed: false,
+                minimum_build_completed: false,
+                minimum_pushups_completed: false,
+                minimum_no_porn_completed: false,
+                minimum_sleep_before_midnight_completed: false,
+                no_zero_day_completed: false,
+                full_day_completed: false,
+                notes: ""
+              };
+              const { data: created } = await supabase.from("daily_entries").insert(seed).select("*").single();
+              currentEntry = created;
+            }
+
+            const sinceDate = new Date();
+            sinceDate.setDate(sinceDate.getDate() - 6);
+            const driftSince = sinceDate.toISOString().slice(0, 10);
+
+            const [{ data: proofRows }, { data: driftRows }, { data: historyRows }, { data: streakRow }, { data: reminderRows }, { data: driftHistoryRows }] = await Promise.all([
+              supabase.from("proof_entries").select("*").eq("user_id", session.user.id).eq("date", today).order("created_at", { ascending: false }),
+              supabase.from("daily_drift_logs").select("*").eq("user_id", session.user.id).eq("date", today),
+              supabase.from("daily_entries").select("*").eq("user_id", session.user.id).order("date", { ascending: false }).limit(21),
+              supabase.from("streak_state").select("*").eq("user_id", session.user.id).maybeSingle(),
+              supabase.from("reminder_preferences").select("*").eq("user_id", session.user.id).maybeSingle(),
+              supabase.from("daily_drift_logs").select("*").eq("user_id", session.user.id).gte("date", driftSince)
+            ]);
+
+            if (cancelled) return;
+            setProofs(proofRows || []);
+            setDriftLogs(driftRows || []);
+            setDriftHistory(driftHistoryRows || []);
+            setSelectedDrifts(new Set((driftRows || []).map((item) => item.drift_trigger)));
+            setHistory(historyRows || []);
+            setStreak(streakRow || null);
+            setReminders(reminderRows || {
+              morning_reminder_time: "07:30",
+              exercise_reminder_time: "18:00",
+              evening_checkin_time: "21:30",
+              notifications_enabled: false
+            });
+
+            const driftCount = (driftRows || []).length;
+            const proofCount = (proofRows || []).length;
+            const derived = getTodayState(currentEntry, proofCount, driftCount);
+            const merged = {
+              ...currentEntry,
+              sleep_qualified: derived.sleepQualified,
+              reality_score: derived.realityScore,
+              minimum_viable_day_completed: derived.min,
+              no_zero_day_completed: derived.noZero,
+              full_day_completed: derived.full,
+              proof_submitted: proofCount > 0
+            };
+            setEntry(merged);
+          } catch (error) {
+            if (!cancelled) setBootError(error.message || "Failed to load app.");
+          } finally {
+            if (!cancelled) setLoading(false);
+          }
+        };
+
+        load();
+        return () => {
+          cancelled = true;
+        };
+      }, [session]);
+
+      useEffect(() => {
+        if (!entry || !profile || !reminders) return;
+        if (reminderIntervalRef.current) clearInterval(reminderIntervalRef.current);
+
+        const pingReminders = () => {
+          const today = isoDateForTimezone(profile.timezone);
+          const hourMinute = new Intl.DateTimeFormat("en-GB", {
+            timeZone: profile.timezone,
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+          }).format(new Date());
+
+          const slots = [
+            { key: "morning", time: reminders.morning_reminder_time, text: "Set your one big goal and check today’s grounding." },
+            { key: "exercise", time: reminders.exercise_reminder_time, text: "Move your body before the day slips away." },
+            { key: "evening", time: reminders.evening_checkin_time, text: "Finish the strict tasks before the day closes." }
+          ];
+
+          slots.forEach((slot) => {
+            const cacheKey = `steady-path-reminder-${today}-${slot.key}`;
+            if (hourMinute >= slot.time && sessionStorage.getItem(cacheKey) !== "1") {
+              sessionStorage.setItem(cacheKey, "1");
+              setBannerMessage(slot.text);
+              if (reminders.notifications_enabled && "Notification" in window && Notification.permission === "granted") {
+                new Notification("The Steady Path", { body: slot.text });
+              }
+            }
+          });
+        };
+
+        pingReminders();
+        reminderIntervalRef.current = window.setInterval(pingReminders, 30000);
+        return () => {
+          if (reminderIntervalRef.current) clearInterval(reminderIntervalRef.current);
+        };
+      }, [entry, profile, reminders]);
+
+      const weekdayKey = profile ? weekdayForTimezone(profile.timezone) : "monday";
+      const guidance = DAY_RULES[weekdayKey] || DAY_RULES.monday;
+
+      const proofCount = proofs.length;
+      const driftCount = driftLogs.length;
+      const todayState = entry ? getTodayState(entry, proofCount, driftCount) : null;
+
+      const profileName = profile?.display_name || session?.user?.email?.split("@")[0] || "User";
+
+      const driftTrend = useMemo(() => {
+        const counts = Object.fromEntries(DRIFT_TRIGGERS.map((item) => [item.key, 0]));
+        driftHistory.forEach((item) => {
+          counts[item.drift_trigger] = (counts[item.drift_trigger] || 0) + 1;
+        });
+        return counts;
+      }, [driftHistory]);
+
+      const recentSummary = useMemo(() => {
+        if (!history.length) return { full: 0, noZero: 0, minimum: 0 };
+        return history.reduce((acc, item) => {
+          if (item.full_day_completed) acc.full += 1;
+          if (item.no_zero_day_completed) acc.noZero += 1;
+          if (item.minimum_viable_day_completed) acc.minimum += 1;
+          return acc;
+        }, { full: 0, noZero: 0, minimum: 0 });
+      }, [history]);
+
+      async function refreshStreakState(nextEntry, nextProofsCount, nextDriftCount) {
+        if (!profile || !session) return;
+        const rows = await supabase
+          .from("daily_entries")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .order("date", { ascending: false })
+          .limit(120);
+
+        const mergedDays = (rows.data || []).map((row) => {
+          if (row.date === nextEntry.date) {
+            return {
+              ...row,
+              ...nextEntry,
+              sleep_qualified: computeSleepQualified(nextEntry),
+              reality_score: computeRealityScore(nextEntry, nextDriftCount, nextProofsCount),
+              minimum_viable_day_completed: computeMinimumDay(nextEntry),
+              no_zero_day_completed: computeNoZeroDay(nextEntry, nextProofsCount),
+              full_day_completed: computeFullDay(nextEntry),
+              proof_submitted: nextProofsCount > 0
+            };
+          }
+          return row;
+        }).sort((a, b) => a.date.localeCompare(b.date));
+
+        const today = isoDateForTimezone(profile.timezone);
+        const firstTrackedDate = mergedDays[0]?.date || today;
+        const dayMap = new Map(mergedDays.map((row) => [row.date, row]));
+        const allDays = [];
+        for (let cursor = firstTrackedDate; cursor <= today; cursor = addUtcDays(cursor, 1)) {
+          allDays.push(dayMap.get(cursor) || {
+            date: cursor,
+            full_day_completed: false,
+            no_zero_day_completed: false,
+            minimum_viable_day_completed: false
+          });
+        }
+
+        let bestFullStreak = 0;
+        let identitySaveCount = 0;
+        let currentFull = 0;
+        let currentNoZero = 0;
+        let workingWeek = null;
+        let graceUsedThisWeek = false;
+
+        allDays.forEach((row) => {
+          const weekStart = startOfWeekIso(row.date);
+          if (workingWeek !== weekStart) {
+            workingWeek = weekStart;
+            graceUsedThisWeek = false;
+          }
+
+          if (row.full_day_completed) {
+            currentFull += 1;
+          } else if (!graceUsedThisWeek) {
+            graceUsedThisWeek = true;
+          } else {
+            currentFull = 0;
+          }
+
+          bestFullStreak = Math.max(bestFullStreak, currentFull);
+
+          if (row.no_zero_day_completed) {
+            currentNoZero += 1;
+          } else {
+            currentNoZero = 0;
+          }
+
+          if (row.minimum_viable_day_completed && !row.full_day_completed) {
+            identitySaveCount += 1;
+          }
+        });
+
+        const currentWeekStart = startOfWeekIso(today);
+        const currentWeekRows = allDays.filter((row) => startOfWeekIso(row.date) === currentWeekStart);
+        const currentWeekMisses = currentWeekRows.filter((row) => !row.full_day_completed).length;
+        const weeklyGraceAvailable = currentWeekMisses === 0;
+        const streakState = {
+          user_id: session.user.id,
+          full_streak: currentFull,
+          best_full_streak: Math.max(bestFullStreak, currentFull),
+          no_zero_day_streak: currentNoZero,
+          identity_save_count: identitySaveCount,
+          weekly_grace_available: weeklyGraceAvailable,
+          weekly_grace_last_reset_date: currentWeekStart,
+          last_success_date: allDays.filter((row) => row.full_day_completed).slice(-1)[0]?.date || null
+        };
+
+        await supabase.from("streak_state").upsert(streakState);
+        setStreak(streakState);
+      }
+
+      async function persistEntry(patch, overrides = {}) {
+        if (!entry || !session) return;
+        try {
+          setSaveState("saving");
+          const nextEntry = { ...entry, ...patch };
+          const proofsCount = overrides.proofsCount ?? proofs.length;
+          const nextDriftCount = overrides.driftCount ?? driftLogs.length;
+          const derived = getTodayState(nextEntry, proofsCount, nextDriftCount);
+          const payload = {
+            ...nextEntry,
+            sleep_qualified: derived.sleepQualified,
+            reality_score: derived.realityScore,
+            minimum_viable_day_completed: derived.min,
+            no_zero_day_completed: derived.noZero,
+            full_day_completed: derived.full,
+            proof_submitted: proofsCount > 0
+          };
+          const { data, error } = await supabase
+            .from("daily_entries")
+            .update(payload)
+            .eq("id", entry.id)
+            .select("*")
+            .single();
+          if (error) throw error;
+          setEntry(data);
+          await refreshStreakState(data, proofsCount, nextDriftCount);
+          setSaveState("saved");
+          window.setTimeout(() => setSaveState("idle"), 1200);
+        } catch (error) {
+          setSaveState("error");
+          setBannerMessage(error.message || "Could not save today.");
+        }
+      }
+
+      async function handleDriftToggle(trigger) {
+        if (!session || !profile || !entry) return;
+        try {
+          const next = new Set(selectedDrifts);
+          if (next.has(trigger)) {
+            next.delete(trigger);
+          } else {
+            next.add(trigger);
+          }
+          setSelectedDrifts(next);
+
+          await supabase.from("daily_drift_logs").delete().eq("user_id", session.user.id).eq("date", entry.date);
+          if (next.size > 0) {
+            await supabase.from("daily_drift_logs").insert(
+              Array.from(next).map((item) => ({
+                user_id: session.user.id,
+                date: entry.date,
+                drift_trigger: item
+              }))
+            );
+          }
+
+          const { data } = await supabase.from("daily_drift_logs").select("*").eq("user_id", session.user.id).eq("date", entry.date);
+          const nextDriftRows = data || [];
+          setDriftLogs(nextDriftRows);
+          setDriftHistory((current) => {
+            const filtered = current.filter((item) => item.date !== entry.date);
+            return [...filtered, ...nextDriftRows];
+          });
+          if (next.size > 0) {
+            await persistEntry({ recovery_mode_used: true }, { driftCount: nextDriftRows.length });
+            setBannerMessage("Recover the day. Do the next right thing now.");
+          } else {
+            await persistEntry({}, { driftCount: nextDriftRows.length });
+          }
+        } catch (error) {
+          setBannerMessage(error.message || "Could not save drift triggers.");
+        }
+      }
+
+      async function handleProofSubmit(event) {
+        event.preventDefault();
+        if (!session || !entry) return;
+
+        try {
+          let payload = {
+            user_id: session.user.id,
+            date: entry.date,
+            proof_type: proofType,
+            storage_path: null,
+            external_url: null,
+            text_content: null
+          };
+
+          if (proofType === "note") {
+            payload.text_content = proofText.trim();
+          } else if (proofType === "github_link") {
+            payload.external_url = proofUrl.trim();
+          } else if ((proofType === "photo" || proofType === "screenshot") && proofFile) {
+            const filePath = `${session.user.id}/${entry.date}/${Date.now()}-${proofFile.name}`;
+            const { error: uploadError } = await supabase.storage.from("proof-of-day").upload(filePath, proofFile, { upsert: false });
+            if (uploadError) throw uploadError;
+            payload.storage_path = filePath;
+          } else {
+            throw new Error("Add proof content before submitting.");
+          }
+
+          const { data, error } = await supabase.from("proof_entries").insert(payload).select("*").single();
+          if (error) throw error;
+          const nextProofs = [data, ...proofs];
+          setProofs(nextProofs);
+          setProofText("");
+          setProofUrl("");
+          setProofFile(null);
+          await persistEntry({ proof_submitted: true }, { proofsCount: nextProofs.length });
+          setBannerMessage("Proof saved. Illusion loses power when the day leaves evidence.");
+        } catch (error) {
+          setBannerMessage(error.message || "Could not save proof.");
+        }
+      }
+
+      async function handleReminderPrefChange(key, value) {
+        if (!session || !reminders) return;
+        const next = { ...reminders, [key]: value };
+        setReminders(next);
+        await supabase.from("reminder_preferences").upsert({ user_id: session.user.id, ...next });
+      }
+
+      async function requestNotifications() {
+        if (!("Notification" in window)) {
+          setBannerMessage("Browser notifications are not supported here.");
+          return;
+        }
+        const result = await Notification.requestPermission();
+        if (result === "granted") {
+          setBannerMessage("Browser alerts are enabled while the app is open.");
+          await handleReminderPrefChange("notifications_enabled", true);
+        } else {
+          setBannerMessage("Notifications were not allowed. In-app reminders will still work.");
+          await handleReminderPrefChange("notifications_enabled", false);
+        }
+      }
+
+      async function handleAuthSubmit(event) {
+        event.preventDefault();
+        if (!supabase) return;
+        setAuthMessage("");
+        try {
+          if (authMode === "signin") {
+            const { error } = await supabase.auth.signInWithPassword({
+              email: authEmail,
+              password: authPassword
+            });
+            if (error) throw error;
+          } else {
+            const { error } = await supabase.auth.signUp({
+              email: authEmail,
+              password: authPassword
+            });
+            if (error) throw error;
+            setAuthMessage("Account created. If your project requires email confirmation, check your inbox.");
+          }
+        } catch (error) {
+          setAuthMessage(error.message || "Authentication failed.");
+        }
+      }
+
+      async function signOut() {
+        await supabase.auth.signOut();
+        setSession(null);
+        setProfile(null);
+        setEntry(null);
+        setProofs([]);
+        setDriftLogs([]);
+        setHistory([]);
+      }
+
+      if (!CONFIG || !supabase) {
+        return html`
+          <div className="setup-shell">
+            <div className="setup-card">
+              <div className="eyebrow">Deploy setup</div>
+              <h1 className="hero-title">The Steady Path needs Supabase before it can hold you accountable.</h1>
+              <p className="setup-copy">
+                Create an <span className="mark">app-config.js</span> file next to this page, copy the values from
+                <span className="line-mark">app-config.example.js</span>, and paste your public Supabase URL and anon key.
+              </p>
+              <div className="footer-note">
+                Then run the SQL in <strong>supabase-schema.sql</strong>, deploy the folder to Vercel, and this page will boot into the real accountability app.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (loading) {
+        return html`
+          <div className="setup-shell">
+            <div className="setup-card">
+              <div className="eyebrow">Loading</div>
+              <h1 className="hero-title">Booting your accountability system.</h1>
+            </div>
+          </div>
+        `;
+      }
+
+      if (!session) {
+        return html`
+          <div className="auth-shell">
+            <div className="auth-card">
+              <div className="eyebrow">Accountability</div>
+              <h1 className="hero-title">Sign in to make the system real.</h1>
+              <p className="auth-copy">
+                Supabase keeps your streaks, proof, drift patterns, reminders, and recovery history synced across devices.
+              </p>
+              <form onSubmit=${handleAuthSubmit}>
+                <div className="field-grid">
+                  <div className="field-stack">
+                    <label>Email</label>
+                    <input type="email" value=${authEmail} onInput=${(e) => setAuthEmail(e.target.value)} required />
+                  </div>
+                  <div className="field-stack">
+                    <label>Password</label>
+                    <input type="password" value=${authPassword} onInput=${(e) => setAuthPassword(e.target.value)} required />
+                  </div>
+                </div>
+                <div className="hero-actions">
+                  <button className="primary-btn" type="submit">${authMode === "signin" ? "Sign in" : "Create account"}</button>
+                  <button className="ghost-btn" type="button" onClick=${() => setAuthMode(authMode === "signin" ? "signup" : "signin")}>
+                    ${authMode === "signin" ? "Need an account?" : "Already have an account?"}
+                  </button>
+                </div>
+                ${authMessage ? html`<div className="footer-note">${authMessage}</div>` : null}
+                ${bootError ? html`<div className="footer-note danger">${bootError}</div>` : null}
+              </form>
+            </div>
+          </div>
+        `;
+      }
+
+      return html`
+        <div className="shell">
+          <header className="topbar">
+            <div className="topbar-inner">
+              <div className="brand">
+                <div className="brand-mark" aria-hidden="true">SP</div>
+                <div className="brand-copy">
+                  <div className="brand-kicker">Personal Reset Document</div>
+                  <div className="brand-title">The Steady Path</div>
+                </div>
+              </div>
+              <nav className="nav-strip" aria-label="Pages">
+                ${[
+                  ["today", "Today"],
+                  ["history", "History"],
+                  ["guide", "Guide"],
+                  ["settings", "Settings"]
+                ].map(([key, label]) => html`
+                  <button key=${key} className=${`nav-pill ${activePage === key ? "active" : ""}`} onClick=${() => setActivePage(key)}>${label}</button>
+                `)}
+              </nav>
+              <div className="action-row">
+                <button className="theme-toggle" type="button" onClick=${() => setTheme(theme === "dark" ? "light" : "dark")}>
+                  ${theme === "dark" ? "Light mode" : "Dark mode"}
+                </button>
+                <button className="ghost-btn" type="button" onClick=${signOut}>Sign out</button>
+              </div>
+            </div>
+          </header>
+
+          <main className="page">
+            <div className="banner-stack">
+              ${bannerMessage ? html`
+                <div className="banner">
+                  <strong>Attention</strong>
+                  <div>${bannerMessage}</div>
+                </div>
+              ` : null}
+              ${saveState === "saving" ? html`
+                <div className="banner">
+                  <strong>Saving</strong>
+                  <div>Writing today into reality.</div>
+                </div>
+              ` : null}
+              ${todayState?.status === "minimum_day" ? html`
+                <div className="banner">
+                  <strong>Recover the day</strong>
+                  <div>Do not collapse. Protect the identity. Save the day with one clean action at a time.</div>
+                </div>
+              ` : null}
+            </div>
+
+            <div className="tabs">
+              ${[
+                ["today", "Today"],
+                ["history", "History"],
+                ["guide", "Guide"],
+                ["settings", "Settings"]
+              ].map(([key, label]) => html`
+                <button key=${key} className=${`page-tab ${activePage === key ? "active" : ""}`} onClick=${() => setActivePage(key)}>${label}</button>
+              `)}
+            </div>
+
+            ${activePage === "today" && entry ? html`
+              <div className="page-grid">
+                <div className="main-stack">
+                  <section className="panel hero-panel">
+                    <div className="eyebrow">${displayDateForTimezone(profile.timezone)}</div>
+                    <h1 className="hero-title">Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "night"}, ${profileName}.</h1>
+                    <div className="hero-copy">
+                      Today is not about emotion. It is about visible proof, clean action, and returning to reality before the mind starts escaping.
+                    </div>
+                    <div className="hero-actions">
+                      <button className="primary-btn" type="button" onClick=${() => setBannerMessage("I’m drifting. Put the phone away and do one recovery action now.")}>I'm drifting</button>
+                      <button className="ghost-btn" type="button" onClick=${requestNotifications}>Enable browser alerts</button>
+                    </div>
+                    <div className="stats-grid">
+                      <div className="stat-card">
+                        <div className="stat-label">Full streak</div>
+                        <div className="stat-value">${streak?.full_streak ?? 0}</div>
+                        <div className="stat-copy">Strict days only.</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-label">No zero day</div>
+                        <div className="stat-value">${streak?.no_zero_day_streak ?? 0}</div>
+                        <div className="stat-copy">Continuity without collapse.</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-label">Reality score</div>
+                        <div className="stat-value">${todayState?.realityScore ?? 0}</div>
+                        <div className="stat-copy">Execution beats illusion.</div>
+                      </div>
+                      <div className="stat-card">
+                        <div className="stat-label">Today state</div>
+                        <div className="stat-value">${todayState?.status === "full_success" ? "Full" : todayState?.status === "minimum_day" ? "Saved" : "Open"}</div>
+                        <div className="stat-copy">${saveState === "saved" ? "Saved to Supabase." : "Strict but stabilizing."}</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <div className="dashboard-grid">
+                    <section className="panel">
+                      <div className="section-label">Strict day success</div>
+                      <h2 className="section-title">The 4 things that decide the full streak.</h2>
+                      <p className="section-copy">Everything else matters, but these are the non-negotiables that move the main streak.</p>
+                      <div className="field-stack" style=${{ marginTop: "18px" }}>
+                        <label>Today’s Big Goal</label>
+                        <input
+                          type="text"
+                          value=${entry.big_goal_text || ""}
+                          placeholder="One meaningful thing that must be done today"
+                          onInput=${(e) => setEntry({ ...entry, big_goal_text: e.target.value })}
+                          onBlur=${() => persistEntry({ big_goal_text: entry.big_goal_text })}
+                        />
+                      </div>
+                      <div className="task-list">
+                        ${[
+                          ["big_goal_completed", "Big Goal complete", "The one thing that makes today real."],
+                          ["study_build_completed", "Study / Build complete", "Visible output over imagined productivity."],
+                          ["exercise_completed", "Exercise complete", "Move the body before the mind weakens."],
+                        ].map(([key, title, description]) => html`
+                          <div key=${key} className="task-row">
+                            <div className="task-info">
+                              <strong>${title}</strong>
+                              <span>${description}</span>
+                            </div>
+                            <button className=${`toggle ${entry[key] ? "active" : ""}`} onClick=${() => persistEntry({ [key]: !entry[key] })}>
+                              ${entry[key] ? "Done" : "Pending"}
+                            </button>
+                          </div>
+                        `)}
+                        <div className="task-row">
+                          <div className="task-info">
+                            <strong>Sleep time</strong>
+                            <span>Objective input only. The app decides if sleep qualified.</span>
+                          </div>
+                          <input
+                            type="time"
+                            value=${entry.sleep_time || ""}
+                            onInput=${(e) => setEntry({ ...entry, sleep_time: e.target.value })}
+                            onBlur=${() => persistEntry({ sleep_time: entry.sleep_time })}
+                            style=${{ maxWidth: "140px" }}
+                          />
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="panel">
+                      <div className="section-label">Minimum Viable Day</div>
+                      <h2 className="section-title">Protect the identity if perfection is gone.</h2>
+                      <p className="section-copy">This does not advance the full streak. It keeps the day from collapsing into nothing.</p>
+                      <div className="task-list">
+                        ${[
+                          ["minimum_build_completed", "15 min build", "One meaningful study/build action."],
+                          ["minimum_pushups_completed", "10 pushups", "Move, even if motivation is low."],
+                          ["minimum_no_porn_completed", "No porn", "Protect the mind from collapse."],
+                          ["minimum_sleep_before_midnight_completed", "Sleep before midnight", "A cleaner reset for tomorrow."]
+                        ].map(([key, title, description]) => html`
+                          <div key=${key} className="task-row">
+                            <div className="task-info">
+                              <strong>${title}</strong>
+                              <span>${description}</span>
+                            </div>
+                            <button className=${`toggle ${entry[key] ? "active" : ""}`} onClick=${() => persistEntry({ [key]: !entry[key] })}>
+                              ${entry[key] ? "Done" : "Pending"}
+                            </button>
+                          </div>
+                        `)}
+                      </div>
+                      <div className="metric-status">
+                        ${todayState?.min ? "Minimum viable day protected" : "Still open — save the day if needed"}
+                      </div>
+                    </section>
+
+                    <section className="panel">
+                      <div className="section-label">Drift triggers</div>
+                      <h2 className="section-title">Track the real ways you escape.</h2>
+                      <p className="section-copy">One tap only. No vague guilt. Just honest pattern visibility.</p>
+                      <div className="chip-grid">
+                        ${DRIFT_TRIGGERS.map((trigger) => html`
+                          <button
+                            key=${trigger.key}
+                            className=${`chip ${selectedDrifts.has(trigger.key) ? "selected" : ""}`}
+                            onClick=${() => handleDriftToggle(trigger.key)}
+                          >
+                            ${trigger.label}
+                          </button>
+                        `)}
+                      </div>
+                      <div className="footer-note">If you log drift, the app should move you into recovery instead of “day ruined” thinking.</div>
+                    </section>
+
+                    <section className="panel">
+                      <div className="section-label">Supportive insight</div>
+                      <h2 className="section-title">Silence, fantasy, and proof.</h2>
+                      <div className="field-grid">
+                        <div className="field-stack">
+                          <label>Silent time minutes</label>
+                          <input
+                            type="text"
+                            value=${String(entry.silent_time_minutes || 0)}
+                            onInput=${(e) => setEntry({ ...entry, silent_time_minutes: Number(e.target.value.replace(/\D/g, "")) || 0 })}
+                            onBlur=${() => persistEntry({ silent_time_minutes: entry.silent_time_minutes })}
+                          />
+                        </div>
+                        <div className="field-stack">
+                          <label>Wake time (optional)</label>
+                          <input
+                            type="time"
+                            value=${entry.wake_time || ""}
+                            onInput=${(e) => setEntry({ ...entry, wake_time: e.target.value })}
+                            onBlur=${() => persistEntry({ wake_time: entry.wake_time })}
+                          />
+                        </div>
+                      </div>
+                      <div className="task-list">
+                        <div className="task-row">
+                          <div className="task-info">
+                            <strong>Walk without headphones</strong>
+                            <span>Your nervous system needs quiet retraining.</span>
+                          </div>
+                          <button className=${`toggle ${entry.walk_without_headphones_completed ? "active" : ""}`} onClick=${() => persistEntry({ walk_without_headphones_completed: !entry.walk_without_headphones_completed })}>
+                            ${entry.walk_without_headphones_completed ? "Done" : "Pending"}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="field-stack" style=${{ marginTop: "12px" }}>
+                        <label>Fantasy detection</label>
+                        <div className="chip-grid">
+                          ${[
+                            ["no", "No"],
+                            ["a_little", "A little"],
+                            ["yes", "Yes"]
+                          ].map(([value, label]) => html`
+                            <button
+                              key=${value}
+                              className=${`chip secondary ${entry.fantasy_detection_answer === value ? "selected" : ""}`}
+                              onClick=${() => persistEntry({ fantasy_detection_answer: value })}
+                            >
+                              ${label}
+                            </button>
+                          `)}
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="panel">
+                      <div className="section-label">Recovery mode</div>
+                      <h2 className="section-title">Interrupt the collapse fast.</h2>
+                      <p className="section-copy">This is for the moment you feel the day slipping. Do not negotiate. Pick the next correction.</p>
+                      <div className="chip-grid">
+                        ${RECOVERY_ACTIONS.map((action) => html`
+                          <button
+                            key=${action}
+                            className=${`chip secondary ${entry.recovery_action_key === action ? "selected" : ""}`}
+                            onClick=${() => persistEntry({ recovery_mode_used: true, recovery_action_key: action })}
+                          >
+                            ${action}
+                          </button>
+                        `)}
+                      </div>
+                    </section>
+
+                    <section className="panel">
+                      <div className="section-label">Proof of day</div>
+                      <h2 className="section-title">Kill imagined productivity with evidence.</h2>
+                      <form onSubmit=${handleProofSubmit}>
+                        <div className="field-grid">
+                          <div className="field-stack">
+                            <label>Proof type</label>
+                            <select value=${proofType} onChange=${(e) => setProofType(e.target.value)}>
+                              <option value="note">Note</option>
+                              <option value="github_link">GitHub link</option>
+                              <option value="screenshot">Screenshot</option>
+                              <option value="photo">Photo</option>
+                            </select>
+                          </div>
+                          <div className="field-stack">
+                            <label>${proofType === "github_link" ? "Link" : proofType === "note" ? "Short note" : "File"}</label>
+                            ${proofType === "github_link" ? html`
+                              <input type="url" value=${proofUrl} onInput=${(e) => setProofUrl(e.target.value)} placeholder="https://github.com/..." />
+                            ` : proofType === "note" ? html`
+                              <input type="text" value=${proofText} onInput=${(e) => setProofText(e.target.value)} placeholder="What real thing exists because of today?" />
+                            ` : html`
+                              <input type="file" accept="image/*" onChange=${(e) => setProofFile(e.target.files[0] || null)} />
+                            `}
+                          </div>
+                        </div>
+                        <div className="hero-actions">
+                          <button className="primary-btn" type="submit">Add proof</button>
+                        </div>
+                      </form>
+                      <div className="proof-list">
+                        ${proofs.length === 0 ? html`<div className="proof-item"><strong>No proof yet</strong><p>No zero days. Leave evidence.</p></div>` : proofs.map((proof) => html`
+                          <div key=${proof.id} className="proof-item">
+                            <strong>${proof.proof_type.replace("_", " ")}</strong>
+                            <p>${proof.text_content || proof.external_url || proof.storage_path}</p>
+                          </div>
+                        `)}
+                      </div>
+                    </section>
+                  </div>
+                </div>
+
+                <aside className="side-stack">
+                  <section className="panel">
+                    <div className="section-label">Today’s grounding</div>
+                    <h2 className="section-title">${guidance.title}</h2>
+                    <div className="guide-grid">
+                      <div className="soft-card">
+                        <div className="sub-label">Wear</div>
+                        <div>${guidance.colorToWear}</div>
+                      </div>
+                      <div className="soft-card">
+                        <div className="sub-label">Chant</div>
+                        <div>${guidance.mantra}</div>
+                      </div>
+                      <div className="soft-card">
+                        <div className="sub-label">Pray to</div>
+                        <div>${guidance.deityOrPrayer}</div>
+                      </div>
+                      <div className="soft-card">
+                        <div className="sub-label">Food</div>
+                        <div>${guidance.avoidNonVeg ? "Avoid non-veg" : "No non-veg restriction"}</div>
+                      </div>
+                    </div>
+                    <div className="proof-list">
+                      <div className="proof-item">
+                        <strong>Focus</strong>
+                        <p>${guidance.focusNotes.join(" • ")}</p>
+                      </div>
+                      <div className="proof-item">
+                        <strong>Avoid</strong>
+                        <p>${guidance.avoidNotes.join(" • ")}</p>
+                      </div>
+                      ${guidance.offeringNotes?.length ? html`
+                        <div className="proof-item">
+                          <strong>Offerings</strong>
+                          <p>${guidance.offeringNotes.join(" • ")}</p>
+                        </div>
+                      ` : null}
+                    </div>
+                  </section>
+
+                  <section className="panel">
+                    <div className="section-label">Status</div>
+                    <div className="score-band">
+                      <div className="metric-card">
+                        <div className="sub-label">Sleep</div>
+                        <div className="metric-value">${todayState?.sleepQualified ? "Qualified" : "Open"}</div>
+                        <div className="stat-copy">Sleep by 11:30 PM for full-day success.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">Drift</div>
+                        <div className="metric-value">${driftCount}</div>
+                        <div className="stat-copy">Triggers logged today.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">Proof</div>
+                        <div className="metric-value">${proofCount}</div>
+                        <div className="stat-copy">Real evidence submitted.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">No zero day</div>
+                        <div className="metric-value">${todayState?.noZero ? "Yes" : "Not yet"}</div>
+                        <div className="stat-copy">One action still saves the day.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">Weekly grace</div>
+                        <div className="metric-value">${streak?.weekly_grace_available ? "Available" : "Used"}</div>
+                        <div className="stat-copy">One full-streak miss can be absorbed each week.</div>
+                      </div>
+                    </div>
+                  </section>
+                </aside>
+              </div>
+            ` : null}
+
+            ${activePage === "history" && entry ? html`
+              <div className="page-grid">
+                <div className="main-stack">
+                  <section className="panel">
+                    <div className="section-label">History</div>
+                    <h2 className="section-title">Proof beats self-deception.</h2>
+                    <div className="score-band">
+                      <div className="metric-card">
+                        <div className="sub-label">Full days</div>
+                        <div className="metric-value">${recentSummary.full}</div>
+                        <div className="stat-copy">Last 21 entries.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">No zero days</div>
+                        <div className="metric-value">${recentSummary.noZero}</div>
+                        <div className="stat-copy">Identity continuity.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">Saved days</div>
+                        <div className="metric-value">${recentSummary.minimum}</div>
+                        <div className="stat-copy">Minimum viable recoveries.</div>
+                      </div>
+                      <div className="metric-card">
+                        <div className="sub-label">Best streak</div>
+                        <div className="metric-value">${streak?.best_full_streak ?? 0}</div>
+                        <div className="stat-copy">Strict success days.</div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="panel">
+                    <div className="section-label">Recent days</div>
+                    <div className="history-list">
+                      ${history.map((item) => html`
+                        <div key=${item.id} className="history-item">
+                          <strong>${item.date}</strong>
+                          <p>
+                            ${item.full_day_completed ? "Full success" : item.minimum_viable_day_completed ? "Minimum day saved" : item.no_zero_day_completed ? "No zero day" : "Miss"} •
+                            Reality score ${item.reality_score}
+                          </p>
+                        </div>
+                      `)}
+                    </div>
+                  </section>
+                </div>
+
+                <aside className="side-stack">
+                  <section className="panel">
+                    <div className="section-label">Drift patterns</div>
+                    <div className="trend-grid">
+                      ${DRIFT_TRIGGERS.map((trigger) => html`
+                        <div key=${trigger.key} className="metric-card">
+                          <div className="sub-label">${trigger.label}</div>
+                          <div className="metric-value">${driftTrend[trigger.key] || 0}</div>
+                          <div className="stat-copy">Logged across the recent 7-day window.</div>
+                        </div>
+                      `)}
+                    </div>
+                  </section>
+                </aside>
+              </div>
+            ` : null}
+
+            ${activePage === "guide" ? html`
+              <div className="main-stack">
+                <section className="panel hero-panel">
+                  <div className="eyebrow">Guide</div>
+                  <h1 className="hero-title">The reflection still matters. The dashboard makes it real.</h1>
+                  <div className="hero-copy">
+                    Use this page when you need wisdom, language, and grounding. Use the Today dashboard when you need action.
+                  </div>
+                </section>
+                <div className="dashboard-grid">
+                  ${GUIDE_SECTIONS.map((section) => html`
+                    <div key=${section.title} className="guide-card">
+                      <div className="section-label">${section.title}</div>
+                      <p>${rich(section.copy)}</p>
+                    </div>
+                  `)}
+                </div>
+              </div>
+            ` : null}
+
+            ${activePage === "settings" && reminders ? html`
+              <div className="page-grid">
+                <div className="main-stack">
+                  <section className="panel">
+                    <div className="section-label">Settings</div>
+                    <h2 className="section-title">Reminder rhythm</h2>
+                    <div className="field-grid">
+                      <div className="field-stack">
+                        <label>Morning reminder</label>
+                        <input type="time" value=${reminders.morning_reminder_time} onInput=${(e) => handleReminderPrefChange("morning_reminder_time", e.target.value)} />
+                      </div>
+                      <div className="field-stack">
+                        <label>Exercise reminder</label>
+                        <input type="time" value=${reminders.exercise_reminder_time} onInput=${(e) => handleReminderPrefChange("exercise_reminder_time", e.target.value)} />
+                      </div>
+                      <div className="field-stack">
+                        <label>Evening review</label>
+                        <input type="time" value=${reminders.evening_checkin_time} onInput=${(e) => handleReminderPrefChange("evening_checkin_time", e.target.value)} />
+                      </div>
+                      <div className="field-stack">
+                        <label>Timezone</label>
+                        <input type="text" value=${profile.timezone} disabled />
+                      </div>
+                    </div>
+                    <div className="hero-actions">
+                      <button className="primary-btn" type="button" onClick=${requestNotifications}>
+                        ${reminders.notifications_enabled ? "Notifications enabled" : "Enable browser notifications"}
+                      </button>
+                    </div>
+                  </section>
+
+                  <section className="panel">
+                    <div className="section-label">Mission mode</div>
+                    <h2 className="section-title">Reserved for later</h2>
+                    <div className="mission-card">
+                      <p>Exam mode, deep work week, dopamine detox week, and fitness reset week are intentionally not active in v1. The structure is ready, but the first job is to make the base system stable and honest.</p>
+                    </div>
+                  </section>
+                </div>
+
+                <aside className="side-stack">
+                  <section className="panel">
+                    <div className="section-label">Account</div>
+                    <div className="proof-item">
+                      <strong>${profileName}</strong>
+                      <p>${session.user.email}</p>
+                    </div>
+                    <div className="proof-item" style=${{ marginTop: "14px" }}>
+                      <strong>Save state</strong>
+                      <p>${saveState === "idle" ? "Ready" : saveState}</p>
+                    </div>
+                  </section>
+                </aside>
+              </div>
+            ` : null}
+          </main>
+        </div>
+      `;
+    }
+
+    createRoot(document.getElementById("root")).render(html`<${App} />`);
+  </script>
+</body>
+</html>
