@@ -31,12 +31,24 @@ function buildEntryPayload(nextEntry, proofCount, driftCount) {
 
 export async function ensureProfile(user) {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata";
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("id, timezone")
+    .eq("id", user.id)
+    .maybeSingle();
 
-  await supabase.from("profiles").upsert({
-    id: user.id,
-    display_name: user.user_metadata?.display_name || user.email?.split("@")[0] || "User",
-    timezone
-  });
+  if (!existingProfile) {
+    await supabase.from("profiles").insert({
+      id: user.id,
+      display_name: user.user_metadata?.display_name || user.email?.split("@")[0] || "User",
+      timezone
+    });
+  } else if (existingProfile.timezone !== timezone) {
+    await supabase
+      .from("profiles")
+      .update({ timezone })
+      .eq("id", user.id);
+  }
 
   await supabase.from("streak_state").upsert({
     user_id: user.id,
@@ -222,4 +234,16 @@ export async function updateReminderPreferences(userId, reminders) {
     user_id: userId,
     ...reminders
   });
+}
+
+export async function updateProfile(userId, patch) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .update(patch)
+    .eq("id", userId)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
 }

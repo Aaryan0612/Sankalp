@@ -1,4 +1,4 @@
-import { BookOpen, History, LayoutDashboard, LogOut, MoonStar, Settings, SunMedium } from "lucide-react";
+import { BookOpen, History, LayoutDashboard, MoonStar, Settings, SunMedium } from "lucide-react";
 import { PAGE_TABS } from "../data/appContent";
 
 export default function AppShell({
@@ -6,7 +6,6 @@ export default function AppShell({
   setTheme,
   activePage,
   setActivePage,
-  signOut,
   children
 }) {
   const tabIcons = {
@@ -21,15 +20,13 @@ export default function AppShell({
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
-            <div className="brand-mark" aria-hidden="true">
-              SP
-            </div>
+            <div className="brand-mark" aria-hidden="true">S</div>
             <div className="brand-copy">
-              <div className="brand-kicker">Personal Reset Document</div>
+              <div className="brand-kicker">Personal system</div>
               <div className="brand-title">The Steady Path</div>
             </div>
           </div>
-          <nav className="nav-strip" aria-label="Pages">
+          <nav className="nav-strip desktop-nav-strip" aria-label="Pages">
             {PAGE_TABS.map(([key, label]) => {
               const Icon = tabIcons[key];
               return (
@@ -41,18 +38,35 @@ export default function AppShell({
             })}
           </nav>
           <div className="action-row">
-            <button className="theme-toggle" type="button" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-              {theme === "dark" ? <SunMedium size={16} strokeWidth={2.2} /> : <MoonStar size={16} strokeWidth={2.2} />}
-              {theme === "dark" ? "Light mode" : "Dark mode"}
-            </button>
-            <button className="ghost-btn" type="button" onClick={signOut}>
-              <LogOut size={16} strokeWidth={2.2} />
-              Sign out
+            <button
+              className="theme-icon-btn"
+              type="button"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <SunMedium size={18} strokeWidth={2.2} /> : <MoonStar size={18} strokeWidth={2.2} />}
             </button>
           </div>
         </div>
       </header>
       <main className="page">{children}</main>
+      <nav className="mobile-bottom-nav" aria-label="Mobile pages">
+        <div className="mobile-bottom-nav-inner">
+          {PAGE_TABS.map(([key, label]) => {
+            const Icon = tabIcons[key];
+            return (
+              <button
+                key={key}
+                className={`mobile-tab ${activePage === key ? "active" : ""}`}
+                onClick={() => setActivePage(key)}
+              >
+                <Icon size={17} strokeWidth={2.2} />
+                <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

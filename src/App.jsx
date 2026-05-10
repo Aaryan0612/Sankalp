@@ -6,7 +6,6 @@ import LoadingScreen from "./components/LoadingScreen";
 import SettingsPage from "./components/SettingsPage";
 import SetupScreen from "./components/SetupScreen";
 import TodayPage from "./components/TodayPage";
-import { PAGE_TABS } from "./data/appContent";
 import { useSteadyPathApp } from "./hooks/useSteadyPathApp";
 
 export default function App() {
@@ -43,16 +42,7 @@ export default function App() {
       setTheme={app.setTheme}
       activePage={app.activePage}
       setActivePage={app.setActivePage}
-      signOut={app.signOut}
     >
-      <div className="tabs">
-        {PAGE_TABS.map(([key, label]) => (
-          <button key={key} className={`page-tab ${app.activePage === key ? "active" : ""}`} onClick={() => app.setActivePage(key)}>
-            {label}
-          </button>
-        ))}
-      </div>
-
       {app.activePage === "today" && app.entry ? (
         <TodayPage
           profileName={app.profileName}
@@ -92,7 +82,13 @@ export default function App() {
       {app.activePage === "guide" ? <GuidePage /> : null}
 
       {app.activePage === "settings" ? (
-        <SettingsPage reminders={app.reminders} handleReminderPrefChange={app.handleReminderPrefChange} />
+        <SettingsPage
+          reminders={app.reminders}
+          handleReminderPrefChange={app.handleReminderPrefChange}
+          profile={app.profile}
+          handleProfileSave={app.handleProfileSave}
+          signOut={app.signOut}
+        />
       ) : null}
     </AppShell>
   );

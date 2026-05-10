@@ -3,10 +3,10 @@ import { DAY_RULES, DRIFT_TRIGGERS } from "../data/appContent";
 import { getTodayState } from "../lib/accountability";
 import { currentLocalHourBucket, displayDateForTimezone, isoDateForTimezone, timeNowForTimezone, weekdayForTimezone } from "../lib/date";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
-import { getBootData, insertProof, recomputeStreakState, replaceDriftLogs, saveEntry, updateReminderPreferences } from "../services/appService";
+import { getBootData, insertProof, recomputeStreakState, replaceDriftLogs, saveEntry, updateProfile, updateReminderPreferences } from "../services/appService";
 
 export function useSteadyPathApp() {
-  const [theme, setTheme] = useState(() => window.localStorage.getItem("steady-path-theme") || "dark");
+  const [theme, setTheme] = useState(() => window.localStorage.getItem("steady-path-theme") || "light");
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bootError, setBootError] = useState("");
@@ -171,7 +171,7 @@ export function useSteadyPathApp() {
   const weekdayKey = profile ? weekdayForTimezone(profile.timezone) : "monday";
   const guidance = DAY_RULES[weekdayKey] || DAY_RULES.monday;
   const profileName = profile?.display_name || session?.user?.email?.split("@")[0] || "User";
-  const dayPart = currentLocalHourBucket();
+  const dayPart = currentLocalHourBucket(profile?.timezone);
 
   const driftTrend = useMemo(() => {
     const counts = Object.fromEntries(DRIFT_TRIGGERS.map((item) => [item.key, 0]));
@@ -287,6 +287,19 @@ export function useSteadyPathApp() {
     const next = { ...reminders, [key]: value };
     setReminders(next);
     await updateReminderPreferences(session.user.id, next);
+  }
+
+  async function handleProfileSave(displayName) {
+    if (!session || !profile) return;
+    try {
+      const nextProfile = await updateProfile(session.user.id, {
+        display_name: displayName.trim() || "User"
+      });
+      setProfile(nextProfile);
+      setBannerMessage("Name updated.");
+    } catch (error) {
+      setBannerMessage(error.message || "Could not update profile.");
+    }
   }
 
   async function requestNotifications() {
@@ -411,6 +424,7 @@ export function useSteadyPathApp() {
     handleDriftToggle,
     handleProofSubmit,
     handleReminderPrefChange,
+    handleProfileSave,
     requestNotifications
   };
 }

@@ -1,9 +1,36 @@
-import { AlarmClock, Focus } from "lucide-react";
+import { AlarmClock, Focus, LogOut, UserRound } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function SettingsPage({ reminders, handleReminderPrefChange }) {
+export default function SettingsPage({ reminders, handleReminderPrefChange, profile, handleProfileSave, signOut }) {
+  const [displayName, setDisplayName] = useState(profile?.display_name || "");
+
+  useEffect(() => {
+    setDisplayName(profile?.display_name || "");
+  }, [profile]);
+
   return (
     <div className="main-stack">
-      <section className="panel">
+      <section className="panel tone-cream">
+        <div className="section-label">Profile</div>
+        <h2 className="section-title">Choose how your name appears in the workspace.</h2>
+        <div className="inline-badge">
+          <UserRound size={16} strokeWidth={2.2} />
+          Personal identity
+        </div>
+        <div className="field-grid profile-grid">
+          <div className="field-stack">
+            <label>Display name</label>
+            <input value={displayName} onChange={(event) => setDisplayName(event.target.value)} placeholder="Enter your name or username" />
+          </div>
+          <div className="form-actions settings-actions">
+            <button className="primary-btn" type="button" onClick={() => handleProfileSave(displayName)}>
+              Save name
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="panel tone-neutral">
         <div className="section-label">Reminders</div>
         <h2 className="section-title">Keep them useful, not noisy.</h2>
         <div className="inline-badge">
@@ -38,7 +65,7 @@ export default function SettingsPage({ reminders, handleReminderPrefChange }) {
         </div>
       </section>
 
-      <section className="panel">
+      <section className="panel tone-lavender">
         <div className="section-label">Mission mode</div>
         <h2 className="section-title">Reserved for a future focused mode system.</h2>
         <div className="inline-badge">
@@ -48,6 +75,18 @@ export default function SettingsPage({ reminders, handleReminderPrefChange }) {
         <p className="section-copy">
           This version leaves room for exam mode, dopamine detox week, deep work week, and fitness reset week without forcing them into v1.
         </p>
+      </section>
+
+      <section className="panel tone-neutral">
+        <div className="section-label">Session</div>
+        <h2 className="section-title">Manage your account access.</h2>
+        <p className="section-copy">Sign out from here when you want to end the session on this device.</p>
+        <div className="form-actions">
+          <button className="ghost-btn" type="button" onClick={signOut}>
+            <LogOut size={16} strokeWidth={2.2} />
+            Sign out
+          </button>
+        </div>
       </section>
     </div>
   );

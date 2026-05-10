@@ -55,23 +55,34 @@ export default function TodayPage({
 
       <div className="page-grid">
         <div className="main-stack">
-          <section className="panel hero-panel">
-            <div className="eyebrow">{displayDate}</div>
-            <h1 className="hero-title">Good {dayPart}, {profileName}.</h1>
-            <div className="hero-copy">
-              Today is not about emotion. It is about visible proof, clean action, and returning to reality before the mind starts escaping.
+          <section className="panel hero-panel hero-band">
+            <div className="hero-grid">
+              <div>
+                <div className="eyebrow">{displayDate}</div>
+                <h1 className="hero-title">Good {dayPart}.</h1>
+                <div className="hero-name">{profileName}</div>
+                <div className="hero-copy">
+                  This workspace is for one thing: reduce noise, choose the next real action, and keep your identity tied to proof instead of mood.
+                </div>
+                <div className="hero-actions">
+                  <button className="primary-btn" type="button" onClick={() => setBannerMessage("I’m drifting. Put the phone away and do one recovery action now.")}>
+                    <ShieldAlert size={16} strokeWidth={2.2} />
+                    Emergency reset
+                  </button>
+                  <button className="ghost-btn" type="button" onClick={requestNotifications}>
+                    <Bell size={16} strokeWidth={2.2} />
+                    Turn on reminders
+                  </button>
+                </div>
+              </div>
+              <div className="hero-note">
+                <div className="hero-note-title">Read this before drift</div>
+                <div className="hero-note-item">Execution first. Feeling follows.</div>
+                <div className="hero-note-item">Protect one meaningful task.</div>
+                <div className="hero-note-item">No zero days. Leave proof.</div>
+              </div>
             </div>
-            <div className="hero-actions">
-              <button className="primary-btn" type="button" onClick={() => setBannerMessage("I’m drifting. Put the phone away and do one recovery action now.")}>
-                <ShieldAlert size={16} strokeWidth={2.2} />
-                I'm drifting
-              </button>
-              <button className="ghost-btn" type="button" onClick={requestNotifications}>
-                <Bell size={16} strokeWidth={2.2} />
-                Enable browser alerts
-              </button>
-            </div>
-            <div className="stats-grid">
+            <div className="stats-grid stats-grid-compact">
               <div className="stat-card">
                 <div className="stat-label">Full streak</div>
                 <div className="stat-icon"><Flame size={18} strokeWidth={2.2} /></div>
@@ -102,7 +113,7 @@ export default function TodayPage({
           </section>
 
           <div className="dashboard-grid">
-            <section className="panel">
+            <section className="panel tone-lavender">
               <div className="section-label">Strict day success</div>
               <h2 className="section-title">The 4 things that decide the full streak.</h2>
               <p className="section-copy">Everything else matters, but these are the non-negotiables that move the main streak.</p>
@@ -150,7 +161,7 @@ export default function TodayPage({
               </div>
             </section>
 
-            <section className="panel">
+            <section className="panel tone-yellow">
               <div className="section-label">Minimum Viable Day</div>
               <h2 className="section-title">Protect the identity if perfection is gone.</h2>
               <p className="section-copy">This does not advance the full streak. It keeps the day from collapsing into nothing.</p>
@@ -173,7 +184,7 @@ export default function TodayPage({
               <div className="metric-status">{todayState?.min ? "Minimum viable day protected" : "Still open — save the day if needed"}</div>
             </section>
 
-            <section className="panel">
+            <section className="panel tone-rose">
               <div className="section-label">Drift triggers</div>
               <h2 className="section-title">Track the real ways you escape.</h2>
               <p className="section-copy">One tap only. No vague guilt. Just honest pattern visibility.</p>
@@ -191,7 +202,7 @@ export default function TodayPage({
               <div className="footer-note">If you log drift, the app moves you into recovery instead of “day ruined” thinking.</div>
             </section>
 
-            <section className="panel">
+            <section className="panel tone-mint">
               <div className="section-label">Supportive insight</div>
               <h2 className="section-title">Silence, fantasy, and proof.</h2>
               <div className="field-grid">
@@ -255,7 +266,7 @@ export default function TodayPage({
               </div>
             </section>
 
-            <section className="panel">
+            <section className="panel tone-sky">
               <div className="section-label">Recovery mode</div>
               <h2 className="section-title">Interrupt the collapse fast.</h2>
               <p className="section-copy">This is for the moment you feel the day slipping. Do not negotiate. Pick the next correction.</p>
@@ -272,7 +283,7 @@ export default function TodayPage({
               </div>
             </section>
 
-            <section className="panel">
+            <section className="panel tone-peach">
               <div className="section-label">Proof of day</div>
               <h2 className="section-title">Kill imagined productivity with evidence.</h2>
               <form onSubmit={handleProofSubmit}>
@@ -297,7 +308,7 @@ export default function TodayPage({
                     )}
                   </div>
                 </div>
-                <div className="hero-actions">
+                <div className="form-actions">
                   <button className="primary-btn" type="submit">
                     Add proof
                   </button>
@@ -323,7 +334,7 @@ export default function TodayPage({
         </div>
 
         <aside className="side-stack">
-          <section className="panel">
+          <section className="panel tone-cream">
             <div className="section-label">Today’s grounding</div>
             <h2 className="section-title">{guidance.title}</h2>
             <div className="guide-grid">
@@ -362,7 +373,7 @@ export default function TodayPage({
             </div>
           </section>
 
-          <section className="panel">
+          <section className="panel tone-neutral">
             <div className="section-label">Status</div>
             <div className="score-band">
               <div className="metric-card">

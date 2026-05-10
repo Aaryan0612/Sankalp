@@ -5,7 +5,7 @@ export default function HistoryPage({ recentSummary, streak, history, driftTrend
   return (
     <div className="page-grid">
       <div className="main-stack">
-        <section className="panel">
+        <section className="panel tone-neutral">
           <div className="section-label">History</div>
           <h2 className="section-title">Proof beats self-deception.</h2>
           <div className="score-band">
@@ -36,7 +36,7 @@ export default function HistoryPage({ recentSummary, streak, history, driftTrend
           </div>
         </section>
 
-        <section className="panel">
+        <section className="panel tone-cream">
           <div className="section-label">Recent days</div>
           <div className="history-list">
             {history.map((item) => (
@@ -59,7 +59,7 @@ export default function HistoryPage({ recentSummary, streak, history, driftTrend
       </div>
 
       <aside className="side-stack">
-        <section className="panel">
+        <section className="panel tone-sky">
           <div className="section-label">Drift patterns</div>
           <div className="trend-grid">
             {DRIFT_TRIGGERS.map((trigger) => (

@@ -50,10 +50,22 @@ export function startOfWeekIso(dateString) {
   return formatIsoDate(date);
 }
 
-export function currentLocalHourBucket() {
-  const hour = new Date().getHours();
+export function currentLocalHourBucket(timezone) {
+  const date = new Date();
+
+  const hour = timezone
+    ? Number(
+        new Intl.DateTimeFormat("en-GB", {
+          timeZone: timezone,
+          hour: "2-digit",
+          hour12: false
+        }).format(date)
+      )
+    : date.getHours();
+
   if (hour < 12) return "morning";
-  if (hour < 18) return "afternoon";
+  if (hour < 17) return "afternoon";
+  if (hour < 21) return "evening";
   return "night";
 }
 

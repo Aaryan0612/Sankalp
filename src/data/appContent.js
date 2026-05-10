@@ -36,6 +36,93 @@ export const GUIDE_SECTIONS = [
   }
 ];
 
+export const GUIDE_ROADMAP = [
+  {
+    title: "Next 30 days",
+    kicker: "Reset window",
+    copy: "Wake early. Sleep before 11:30. Exercise daily. Complete one hard task every day. Reduce screen noise. Build daily. No porn. No late-night drifting. No fake fantasies."
+  },
+  {
+    title: "What your life demands",
+    kicker: "Structure over chaos",
+    copy: "Your life does not improve through comfort, fantasy, or one motivated burst. It improves when structure becomes normal. The more disciplined you become, the better your mind feels. The more chaotic you become, the more mentally destroyed you feel."
+  },
+  {
+    title: "500 boring days",
+    kicker: "Real breakthrough",
+    copy: "Your breakthrough will not come from one big day, one tool, one course, or one idea. It will come from 500 boring days of consistent execution. Wake up. Show up. Do hard things. Finish work. Repeat."
+  }
+];
+
+export const GROUNDED_CONTEXT = [
+  {
+    title: "Low confidence is a condition, not your identity",
+    context: "When self-expression and execution feel suppressed, the answer is not to shrink. It is to rebuild confidence through repetition, finished tasks, and visible proof.",
+    reminder: "Do not obey the low-confidence story. Build anyway."
+  },
+  {
+    title: "A brilliant mind becomes dangerous when it is unstewarded",
+    context: "A fast, imaginative, overstimulated mind can become visionary when directed, or self-destructive when left in fantasy loops and escape habits.",
+    reminder: "Channel intensity into work, not into imaginary futures."
+  },
+  {
+    title: "Pressure periods are tests, not permanent reality",
+    context: "The hard phase is not proof that life is broken forever. It is a stress period that demands structure, humility, physical effort, and steadiness.",
+    reminder: "Treat pressure as training. Build foundations anyway."
+  },
+  {
+    title: "Your strongest remedy is still practical discipline",
+    context: "Prayer, timing, and symbolism can steady the mind, but they do not replace sleep, exercise, silence, repetition, and execution.",
+    reminder: "Return to the basics whenever you feel confused."
+  }
+];
+
+export const INTERNAL_WARNING_SIGNS = [
+  {
+    trigger: "I'll start tomorrow.",
+    meaning: "Escapism is activating. The delay loop has started.",
+    correction: "Do the task now for 5 minutes minimum. Break the pattern immediately."
+  },
+  {
+    trigger: "Let me just watch one tutorial first.",
+    meaning: "Tutorial hell is beginning. Consumption is replacing effort.",
+    correction: "Open the editor first. Attempt the task before consuming more input."
+  },
+  {
+    trigger: "I have a great new startup idea.",
+    meaning: "Avoidance of current incomplete work.",
+    correction: "Write the idea in one line, park it, and return to what was already in front of you."
+  },
+  {
+    trigger: "I don't feel motivated today.",
+    meaning: "Emotional execution mode is taking over.",
+    correction: "Motivation is irrelevant. Sit down, open the task, and stay for 2 minutes."
+  },
+  {
+    trigger: "Everyone else is ahead of me.",
+    meaning: "Comparison trap. Your attention is leaving your own path.",
+    correction: "Close the comparison source. Compare only against yesterday's version of yourself."
+  },
+  {
+    trigger: "Long music session with headphones.",
+    meaning: "Dopamine escape is in progress.",
+    correction: "Remove headphones. Sit in silence for 5 minutes. Re-enter the real task."
+  },
+  {
+    trigger: "Opening the phone immediately after waking.",
+    meaning: "Your best mental hours are being hijacked.",
+    correction: "Keep the phone away from the bed. Protect the first hour after waking."
+  }
+];
+
+export const RETURN_TO_ACTION = [
+  "Execution over emotion.",
+  "Finish before you escape.",
+  "Silence builds power.",
+  "One completed task is worth more than ten imagined futures.",
+  "When confused, return to sleep, movement, silence, and work."
+];
+
 export const DAY_RULES = {
   monday: {
     title: "Monday grounding",
