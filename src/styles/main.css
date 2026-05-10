@@ -456,7 +456,7 @@ body:not(.theme-light) .banner {
 
 .page-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.78fr);
+  grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.74fr);
   gap: 20px;
 }
 
@@ -523,7 +523,7 @@ body:not(.theme-light) .banner {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
   gap: 22px;
   align-items: start;
 }
@@ -1142,7 +1142,7 @@ body:not(.theme-light) .tone-neutral {
 }
 
 .dashboard-grid-wide {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
 }
 
 .exam-task-grid,
@@ -1162,11 +1162,13 @@ body:not(.theme-light) .tone-neutral {
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
+  align-content: start;
+  min-width: 0;
 }
 
 .exam-task-head {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -1176,12 +1178,71 @@ body:not(.theme-light) .tone-neutral {
   align-items: center;
   gap: 8px;
   font-weight: 700;
+  min-width: 0;
 }
 
 .task-meta,
 .task-description {
   color: var(--text-soft);
   line-height: 1.6;
+}
+
+.task-meta {
+  font-size: 0.95rem;
+}
+
+.task-description {
+  margin: 0;
+}
+
+.exam-task-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: auto;
+}
+
+.exam-task-card .toggle {
+  min-width: 96px;
+  padding-inline: 14px;
+  flex-shrink: 0;
+}
+
+.supportive-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 1.3fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.compact-field {
+  align-content: start;
+}
+
+.grounding-list {
+  display: grid;
+  gap: 14px;
+}
+
+.grounding-row {
+  display: grid;
+  grid-template-columns: minmax(82px, auto) minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.grounding-row-wide {
+  grid-template-columns: minmax(82px, auto) minmax(0, 1fr);
+}
+
+.grounding-label {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.grounding-value {
+  min-width: 0;
 }
 
 .session-panel {
@@ -1311,6 +1372,14 @@ body:not(.theme-light) .tone-neutral {
   }
 
   .exam-task-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid-wide {
+    grid-template-columns: 1fr;
+  }
+
+  .supportive-grid {
     grid-template-columns: 1fr;
   }
 }

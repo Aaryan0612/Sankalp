@@ -5,18 +5,18 @@ function TaskCard({ icon, title, description, meta, completed, onToggle, onBegin
   return (
     <div className="exam-task-card">
       <div className="exam-task-head">
-        <div>
-          <div className="task-chip">{icon}{title}</div>
-          <div className="task-meta">{meta}</div>
-        </div>
+        <div className="task-chip">{icon}{title}</div>
         <button className={`toggle ${completed ? "active" : ""}`} onClick={onToggle}>
           {completed ? "Done" : "Pending"}
         </button>
       </div>
+      <div className="task-meta">{meta}</div>
       <p className="task-description">{description}</p>
-      <button className="ghost-btn" type="button" onClick={onBegin}>
-        Begin
-      </button>
+      <div className="exam-task-actions">
+        <button className="ghost-btn" type="button" onClick={onBegin}>
+          Begin
+        </button>
+      </div>
     </div>
   );
 }
@@ -413,10 +413,11 @@ export default function TodayPage({
             <section className="panel tone-mint">
               <div className="section-label">Supportive insight</div>
               <h2 className="section-title">Reality before self-deception.</h2>
-              <div className="field-grid">
-                <div className="field-stack">
+              <div className="supportive-grid">
+                <div className="field-stack compact-field">
                   <label>Silent time minutes</label>
                   <input
+                    className="small-input"
                     type="text"
                     value={String(entry.silent_time_minutes || 0)}
                     onChange={(event) => setEntry({ ...entry, silent_time_minutes: Number(event.target.value.replace(/\D/g, "")) || 0 })}
@@ -504,14 +505,35 @@ export default function TodayPage({
           <section className="panel tone-cream">
             <div className="section-label">Today's grounding</div>
             <h2 className="section-title">{guidance.title}</h2>
-            <div className="guide-day-list">
-              <div><strong>Wear</strong>{guidance.colorToWear}</div>
-              <div><strong>Chant</strong>{guidance.mantra}</div>
-              <div><strong>Pray to</strong>{guidance.deityOrPrayer}</div>
-              <div><strong>Fast</strong>{guidance.fastingRecommended ? "Recommended" : "Optional / no"}</div>
-              <div><strong>Food</strong>{guidance.avoidNonVeg ? "Avoid non-veg" : "No non-veg restriction"}</div>
-              <div><strong>Focus</strong>{guidance.focusNotes.join(" • ")}</div>
-              <div><strong>Avoid</strong>{guidance.avoidNotes.join(" • ")}</div>
+            <div className="grounding-list">
+              <div className="grounding-row">
+                <strong className="grounding-label">Wear</strong>
+                <span className="grounding-value">{guidance.colorToWear}</span>
+              </div>
+              <div className="grounding-row">
+                <strong className="grounding-label">Chant</strong>
+                <span className="grounding-value">{guidance.mantra}</span>
+              </div>
+              <div className="grounding-row">
+                <strong className="grounding-label">Pray to</strong>
+                <span className="grounding-value">{guidance.deityOrPrayer}</span>
+              </div>
+              <div className="grounding-row">
+                <strong className="grounding-label">Fast</strong>
+                <span className="grounding-value">{guidance.fastingRecommended ? "Recommended" : "Optional / no"}</span>
+              </div>
+              <div className="grounding-row">
+                <strong className="grounding-label">Food</strong>
+                <span className="grounding-value">{guidance.avoidNonVeg ? "Avoid non-veg" : "No non-veg restriction"}</span>
+              </div>
+              <div className="grounding-row grounding-row-wide">
+                <strong className="grounding-label">Focus</strong>
+                <span className="grounding-value">{guidance.focusNotes.join(" • ")}</span>
+              </div>
+              <div className="grounding-row grounding-row-wide">
+                <strong className="grounding-label">Avoid</strong>
+                <span className="grounding-value">{guidance.avoidNotes.join(" • ")}</span>
+              </div>
             </div>
           </section>
         </aside>
