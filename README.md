@@ -1,6 +1,6 @@
-# The Steady Path
+# Sankalp
 
-The Steady Path is a Vite + React accountability app backed by Supabase.
+Sankalp is a Vite + React accountability app backed by Supabase.
 
 ## Stack
 

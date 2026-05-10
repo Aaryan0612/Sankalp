@@ -215,18 +215,28 @@ body:not(.theme-light) .topbar {
 }
 
 .brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--navy);
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 255, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, #101f46 0%, #09142f 100%);
   border: 1px solid var(--line);
   color: #f7fbff;
   font-family: "Manrope", system-ui, sans-serif;
   font-size: 0.92rem;
   font-weight: 700;
+  box-shadow: 0 10px 24px rgba(8, 14, 33, 0.18);
+}
+
+.brand-mark-devanagari {
+  font-family: "Tiro Devanagari Marathi", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.06em;
 }
 
 .brand-kicker,
@@ -268,6 +278,20 @@ body:not(.theme-light) .topbar {
 .brand-title {
   font-size: 1.2rem;
   line-height: 1.05;
+}
+
+.brand-title-devanagari {
+  font-family: "Tiro Devanagari Marathi", serif;
+  font-size: clamp(1.6rem, 2vw, 2.05rem);
+  line-height: 0.96;
+  letter-spacing: -0.08em;
+  font-weight: 700;
+  color: var(--text);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+body:not(.theme-light) .brand-title-devanagari {
+  color: #f2f6ff;
 }
 
 .nav-strip {
@@ -697,6 +721,14 @@ body:not(.theme-light) .banner {
   font-weight: 700;
 }
 
+.metric-status-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .inline-badge {
   width: fit-content;
   margin-top: 14px;
@@ -1090,6 +1122,180 @@ body:not(.theme-light) .tone-neutral {
   color: #f39eab;
 }
 
+.danger-banner {
+  border-color: rgba(211, 86, 105, 0.24);
+  background: linear-gradient(180deg, rgba(211, 86, 105, 0.1), rgba(211, 86, 105, 0.03)), var(--surface);
+}
+
+.mode-badge {
+  display: inline-flex;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #dbe6ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-grid-wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.exam-task-grid,
+.timeline-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.exam-task-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.exam-task-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.exam-task-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.task-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.task-meta,
+.task-description {
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.session-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.session-timer {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.session-proof-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--text-soft);
+}
+
+.chart-shell {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  padding: 12px 12px 4px;
+}
+
+.line-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart-grid-line {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-point {
+  fill: var(--blue);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.chart-axis-label,
+.chart-date-label {
+  fill: var(--text-muted);
+  font-size: 12px;
+}
+
+.empty-chart {
+  padding: 0 8px 10px;
+  color: var(--text-soft);
+}
+
+.timeline-grid {
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+}
+
+.timeline-chip {
+  display: grid;
+  gap: 4px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.timeline-chip.full_success {
+  border-color: rgba(86, 69, 212, 0.25);
+  background: linear-gradient(180deg, rgba(86, 69, 212, 0.1), rgba(86, 69, 212, 0.02)), var(--surface);
+}
+
+.timeline-chip.saved {
+  border-color: rgba(193, 149, 27, 0.22);
+  background: linear-gradient(180deg, rgba(193, 149, 27, 0.12), rgba(193, 149, 27, 0.02)), var(--surface);
+}
+
+.timeline-chip.no_zero {
+  border-color: rgba(35, 163, 111, 0.22);
+  background: linear-gradient(180deg, rgba(35, 163, 111, 0.12), rgba(35, 163, 111, 0.02)), var(--surface);
+}
+
+.timeline-chip.miss {
+  border-color: rgba(211, 86, 105, 0.22);
+  background: linear-gradient(180deg, rgba(211, 86, 105, 0.08), rgba(211, 86, 105, 0.02)), var(--surface);
+}
+
+.timeline-chip strong {
+  color: var(--text);
+}
+
+.timeline-chip span,
+.timeline-chip small {
+  color: var(--text-soft);
+}
+
 @media (max-width: 1360px) {
   .hero-grid {
     grid-template-columns: 1fr;
@@ -1102,6 +1308,10 @@ body:not(.theme-light) .tone-neutral {
 
   .hero-note {
     max-width: 720px;
+  }
+
+  .exam-task-grid {
+    grid-template-columns: 1fr;
   }
 }
 

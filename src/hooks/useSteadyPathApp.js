@@ -1,9 +1,36 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DAY_RULES, DRIFT_TRIGGERS } from "../data/appContent";
-import { getTodayState } from "../lib/accountability";
+import {
+  DAILY_REALITY_OPTIONS,
+  DAY_RULES,
+  DRIFT_TRIGGERS,
+  EXAM_SURVIVAL_MODE,
+  REALITY_CHECK_LINES,
+  RECOVERY_ACTIONS,
+  SESSION_PRESETS
+} from "../data/appContent";
+import { buildHistoryInsights, deriveTodayPresentation, getActiveMode, invertPrimaryFocus, mergeDerivedEntry } from "../lib/accountability";
 import { currentLocalHourBucket, displayDateForTimezone, isoDateForTimezone, timeNowForTimezone, weekdayForTimezone } from "../lib/date";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
-import { getBootData, insertProof, recomputeStreakState, replaceDriftLogs, saveEntry, updateProfile, updateReminderPreferences } from "../services/appService";
+import {
+  getBootData,
+  insertProof,
+  recomputeProgressState,
+  replaceDriftLogs,
+  saveEntry,
+  updatePlannedDay,
+  updateProfile,
+  updateReminderPreferences
+} from "../services/appService";
+
+function createDefaultSession(key) {
+  const preset = SESSION_PRESETS[key];
+  if (!preset) return null;
+
+  return {
+    ...preset,
+    startedAt: Date.now()
+  };
+}
 
 export function useSteadyPathApp() {
   const [theme, setTheme] = useState(() => window.localStorage.getItem("steady-path-theme") || "light");
@@ -23,6 +50,7 @@ export function useSteadyPathApp() {
   const [driftHistory, setDriftHistory] = useState([]);
   const [selectedDrifts, setSelectedDrifts] = useState(new Set());
   const [streak, setStreak] = useState(null);
+  const [challenge, setChallenge] = useState(null);
   const [reminders, setReminders] = useState(null);
   const [saveState, setSaveState] = useState("idle");
   const [bannerMessage, setBannerMessage] = useState("");
@@ -30,6 +58,13 @@ export function useSteadyPathApp() {
   const [proofText, setProofText] = useState("");
   const [proofUrl, setProofUrl] = useState("");
   const [proofFile, setProofFile] = useState(null);
+  const [todayPlan, setTodayPlan] = useState(null);
+  const [tomorrowPlan, setTomorrowPlan] = useState(null);
+  const [plannedBigGoalText, setPlannedBigGoalText] = useState("");
+  const [planningNote, setPlanningNote] = useState("");
+  const [currentSession, setCurrentSession] = useState(null);
+  const [sessionNote, setSessionNote] = useState("");
+  const [sessionAttachProof, setSessionAttachProof] = useState(false);
   const reminderIntervalRef = useRef(null);
 
   useEffect(() => {
@@ -115,7 +150,12 @@ export function useSteadyPathApp() {
         setSelectedDrifts(new Set(data.driftLogs.map((item) => item.drift_trigger)));
         setHistory(data.history);
         setStreak(data.streak);
+        setChallenge(data.challenge);
         setReminders(data.reminders);
+        setTodayPlan(data.todayPlan);
+        setTomorrowPlan(data.tomorrowPlan);
+        setPlannedBigGoalText(data.tomorrowPlan?.planned_big_goal_text || "");
+        setPlanningNote(data.tomorrowPlan?.planning_note || "");
       } catch (error) {
         if (!cancelled) {
           setBootError(error.message || "Failed to load app.");
@@ -140,9 +180,9 @@ export function useSteadyPathApp() {
       const hourMinute = timeNowForTimezone(profile.timezone);
 
       const slots = [
-        { key: "morning", time: reminders.morning_reminder_time, text: "Set your one big goal and check today’s grounding." },
+        { key: "morning", time: reminders.morning_reminder_time, text: "Set the anchor. Face aptitude before the day gets noisy." },
         { key: "exercise", time: reminders.exercise_reminder_time, text: "Move your body before the day slips away." },
-        { key: "evening", time: reminders.evening_checkin_time, text: "Finish the strict tasks before the day closes." }
+        { key: "evening", time: reminders.evening_checkin_time, text: "Protect the streak. Close the day with evidence." }
       ];
 
       slots.forEach((slot) => {
@@ -151,7 +191,7 @@ export function useSteadyPathApp() {
           sessionStorage.setItem(cacheKey, "1");
           setBannerMessage(slot.text);
           if (reminders.notifications_enabled && "Notification" in window && Notification.permission === "granted") {
-            new Notification("The Steady Path", { body: slot.text });
+            new Notification("Sankalp", { body: slot.text });
           }
         }
       });
@@ -167,11 +207,14 @@ export function useSteadyPathApp() {
 
   const proofCount = proofs.length;
   const driftCount = driftLogs.length;
-  const todayState = entry ? getTodayState(entry, proofCount, driftCount) : null;
+  const mode = entry ? getActiveMode(entry.date) : getActiveMode(isoDateForTimezone("Asia/Kolkata"));
+  const currentTime = profile ? timeNowForTimezone(profile.timezone) : "12:00";
+  const todayState = entry ? deriveTodayPresentation(entry, proofCount, driftCount, mode, currentTime) : null;
   const weekdayKey = profile ? weekdayForTimezone(profile.timezone) : "monday";
   const guidance = DAY_RULES[weekdayKey] || DAY_RULES.monday;
   const profileName = profile?.display_name || session?.user?.email?.split("@")[0] || "User";
   const dayPart = currentLocalHourBucket(profile?.timezone);
+  const historyInsights = useMemo(() => buildHistoryInsights(history), [history]);
 
   const driftTrend = useMemo(() => {
     const counts = Object.fromEntries(DRIFT_TRIGGERS.map((item) => [item.key, 0]));
@@ -182,42 +225,69 @@ export function useSteadyPathApp() {
   }, [driftHistory]);
 
   const recentSummary = useMemo(() => {
-    if (!history.length) return { full: 0, noZero: 0, minimum: 0 };
+    return {
+      full: historyInsights.strictDays,
+      noZero: (history || []).filter((item) => item.no_zero_day_completed).length,
+      minimum: historyInsights.savedDays
+    };
+  }, [history, historyInsights]);
 
-    return history.reduce(
-      (acc, item) => {
-        if (item.full_day_completed) acc.full += 1;
-        if (item.no_zero_day_completed) acc.noZero += 1;
-        if (item.minimum_viable_day_completed) acc.minimum += 1;
-        return acc;
-      },
-      { full: 0, noZero: 0, minimum: 0 }
-    );
-  }, [history]);
+  const realityCheckLine = useMemo(() => {
+    if (!todayState || todayState.status !== "at_risk") return null;
+    if (driftCount >= 2) return REALITY_CHECK_LINES[0];
+    if (!entry?.primary_focus_completed && !entry?.secondary_continuity_completed) return REALITY_CHECK_LINES[1];
+    if (!entry?.aptitude_completed && currentTime >= "18:00") return REALITY_CHECK_LINES[2];
+    return null;
+  }, [todayState, driftCount, entry, currentTime]);
 
   async function persistEntry(patch, overrides = {}) {
     if (!entry || !session || !profile) return;
 
     try {
       setSaveState("saving");
-      const nextEntry = { ...entry, ...patch };
+      const nextEntry = {
+        ...entry,
+        ...patch
+      };
+
+      if (patch.primary_focus_type) {
+        nextEntry.secondary_continuity_type = invertPrimaryFocus(patch.primary_focus_type);
+      }
+
       const nextProofCount = overrides.proofsCount ?? proofs.length;
       const nextDriftCount = overrides.driftCount ?? driftLogs.length;
       const data = await saveEntry(entry.id, nextEntry, nextProofCount, nextDriftCount);
-      setEntry(data);
-      const nextStreak = await recomputeStreakState({
+      const merged = mergeDerivedEntry(
+        {
+          ...data,
+          planned_big_goal_text: todayPlan?.planned_big_goal_text || "",
+          planning_note: todayPlan?.planning_note || ""
+        },
+        nextProofCount,
+        nextDriftCount,
+        mode
+      );
+      setEntry(merged);
+      const nextProgress = await recomputeProgressState({
         session,
         profile,
-        nextEntry: data,
+        nextEntry: merged,
         proofCount: nextProofCount,
         driftCount: nextDriftCount
       });
-      setStreak(nextStreak);
+      setStreak(nextProgress.streak);
+      setChallenge(nextProgress.challenge);
+      setHistory((current) => {
+        const filtered = current.filter((item) => item.date !== merged.date);
+        return [merged, ...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 60);
+      });
       setSaveState("saved");
       window.setTimeout(() => setSaveState("idle"), 1200);
+      return merged;
     } catch (error) {
       setSaveState("error");
       setBannerMessage(error.message || "Could not save today.");
+      throw error;
     }
   }
 
@@ -247,7 +317,7 @@ export function useSteadyPathApp() {
 
       if (next.size > 0) {
         await persistEntry({ recovery_mode_used: true }, { driftCount: nextDriftRows.length });
-        setBannerMessage("Recover the day. Do the next right thing now.");
+        setBannerMessage("Recover the day. Choose one correction and get back into reality.");
       } else {
         await persistEntry({}, { driftCount: nextDriftRows.length });
       }
@@ -318,6 +388,95 @@ export function useSteadyPathApp() {
     }
   }
 
+  async function saveTomorrowAnchor() {
+    if (!session || !profile) return;
+
+    const tomorrow = addUtcDays(isoDateForTimezone(profile.timezone), 1);
+    const nextPlan = await updatePlannedDay(session.user.id, tomorrow, plannedBigGoalText.trim(), planningNote.trim());
+    setTomorrowPlan(nextPlan);
+    setBannerMessage("Tomorrow now has an anchor.");
+  }
+
+  function beginSession(key) {
+    const next = createDefaultSession(key);
+    if (!next) return;
+    setCurrentSession(next);
+    setSessionNote("");
+    setSessionAttachProof(false);
+  }
+
+  async function completeSession() {
+    if (!currentSession || !entry) return;
+
+    const patch = {};
+
+    if (currentSession.key === "aptitude") patch.aptitude_completed = true;
+    if (currentSession.key === "german") patch.german_completed = true;
+    if (currentSession.key === "dsa") {
+      if (entry.primary_focus_type === "dsa") {
+        patch.primary_focus_completed = true;
+      } else {
+        patch.secondary_continuity_completed = true;
+      }
+    }
+    if (currentSession.key === "react") {
+      if (entry.primary_focus_type === "react") {
+        patch.primary_focus_completed = true;
+      } else {
+        patch.secondary_continuity_completed = true;
+      }
+    }
+    if (currentSession.key === "recovery") {
+      patch.recovery_mode_used = true;
+      patch.recovery_tier = "standard";
+      patch.minimum_study_sprint_completed = true;
+    }
+    if (currentSession.key === "low_energy") {
+      patch.recovery_mode_used = true;
+      patch.recovery_tier = "low_energy";
+      patch.minimum_study_sprint_completed = true;
+    }
+
+    if (sessionNote.trim()) {
+      patch.notes = sessionNote.trim();
+    }
+
+    if (sessionAttachProof && sessionNote.trim() && session) {
+      const proof = await insertProof({
+        userId: session.user.id,
+        date: entry.date,
+        proofType: "note",
+        proofText: sessionNote.trim(),
+        proofUrl: "",
+        proofFile: null
+      });
+      setProofs((current) => [proof, ...current]);
+      await persistEntry(patch, { proofsCount: proofs.length + 1 });
+    } else {
+      await persistEntry(patch);
+    }
+
+    setCurrentSession(null);
+    setSessionNote("");
+    setSessionAttachProof(false);
+    setBannerMessage("Session recorded. Evidence beats imagination.");
+  }
+
+  function cancelSession() {
+    setCurrentSession(null);
+    setSessionNote("");
+    setSessionAttachProof(false);
+  }
+
+  async function selectRecoveryAction(action, tier = "standard") {
+    await persistEntry({
+      recovery_mode_used: true,
+      recovery_tier: tier,
+      recovery_action_key: action
+    });
+    setBannerMessage(tier === "low_energy" ? "Low-energy restart chosen. Keep it small and real." : "Course correction chosen. Protect the day now.");
+  }
+
   async function handleAuthSubmit(event) {
     event.preventDefault();
     if (!supabase) return;
@@ -370,6 +529,7 @@ export function useSteadyPathApp() {
     setDriftLogs([]);
     setDriftHistory([]);
     setHistory([]);
+    setChallenge(null);
   }
 
   return {
@@ -399,6 +559,7 @@ export function useSteadyPathApp() {
     driftTrend,
     selectedDrifts,
     streak,
+    challenge,
     reminders,
     saveState,
     bannerMessage,
@@ -417,6 +578,16 @@ export function useSteadyPathApp() {
     guidance,
     recentSummary,
     displayDate: profile ? displayDateForTimezone(profile.timezone) : "",
+    mode,
+    currentTime,
+    currentSession,
+    beginSession,
+    completeSession,
+    cancelSession,
+    sessionNote,
+    setSessionNote,
+    sessionAttachProof,
+    setSessionAttachProof,
     handleAuthSubmit,
     handleGoogleAuth,
     signOut,
@@ -425,6 +596,19 @@ export function useSteadyPathApp() {
     handleProofSubmit,
     handleReminderPrefChange,
     handleProfileSave,
-    requestNotifications
+    requestNotifications,
+    historyInsights,
+    todayPlan,
+    tomorrowPlan,
+    plannedBigGoalText,
+    setPlannedBigGoalText,
+    planningNote,
+    setPlanningNote,
+    saveTomorrowAnchor,
+    selectRecoveryAction,
+    realityCheckLine,
+    realityOptions: DAILY_REALITY_OPTIONS,
+    recoveryActions: RECOVERY_ACTIONS,
+    examModeMeta: EXAM_SURVIVAL_MODE
   };
 }

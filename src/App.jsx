@@ -70,13 +70,38 @@ export default function App() {
           proofs={app.proofs}
           guidance={app.guidance}
           requestNotifications={app.requestNotifications}
-          driftCount={app.driftCount}
-          proofCount={app.proofCount}
+          mode={app.mode}
+          currentTime={app.currentTime}
+          currentSession={app.currentSession}
+          beginSession={app.beginSession}
+          completeSession={app.completeSession}
+          cancelSession={app.cancelSession}
+          sessionNote={app.sessionNote}
+          setSessionNote={app.setSessionNote}
+          sessionAttachProof={app.sessionAttachProof}
+          setSessionAttachProof={app.setSessionAttachProof}
+          todayPlan={app.todayPlan}
+          tomorrowPlan={app.tomorrowPlan}
+          plannedBigGoalText={app.plannedBigGoalText}
+          setPlannedBigGoalText={app.setPlannedBigGoalText}
+          planningNote={app.planningNote}
+          setPlanningNote={app.setPlanningNote}
+          saveTomorrowAnchor={app.saveTomorrowAnchor}
+          selectRecoveryAction={app.selectRecoveryAction}
+          realityCheckLine={app.realityCheckLine}
+          recoveryActions={app.recoveryActions}
         />
       ) : null}
 
       {app.activePage === "history" && app.entry ? (
-        <HistoryPage recentSummary={app.recentSummary} streak={app.streak} history={app.history} driftTrend={app.driftTrend} />
+        <HistoryPage
+          recentSummary={app.recentSummary}
+          streak={app.streak}
+          history={app.history}
+          driftTrend={app.driftTrend}
+          challenge={app.challenge}
+          historyInsights={app.historyInsights}
+        />
       ) : null}
 
       {app.activePage === "guide" ? <GuidePage /> : null}

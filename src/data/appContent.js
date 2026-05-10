@@ -7,14 +7,107 @@ export const DRIFT_TRIGGERS = [
   { key: "oversleeping", label: "Oversleeping" }
 ];
 
-export const RECOVERY_ACTIONS = [
-  "Put phone away",
-  "10 pushups",
-  "5 min breathing",
-  "15 min focused task",
-  "Silence mode",
-  "Cold water splash",
-  "Walk without headphones"
+export const EXAM_SURVIVAL_MODE = {
+  title: "Exam Survival Mode",
+  startsAt: "2026-05-11",
+  endsAt: "2026-06-27",
+  subtitle: "Practicals, viva, and theory prep. Reduce life to what moves the exam season forward."
+};
+
+export const EXAM_SURVIVAL_SUBJECTS = [
+  {
+    key: "aptitude",
+    title: "Aptitude",
+    minimum: "60–90 mins daily",
+    principle: "Face the problem. Do not escape it.",
+    reinforcement: "Speed comes from repetition. One solved set is better than five saved resources."
+  },
+  {
+    key: "dsa",
+    title: "DSA",
+    minimum: "1 concept or 2–3 problems",
+    principle: "Solving is the work. Watching is not the work.",
+    reinforcement: "Ego discomfort is not an emergency."
+  },
+  {
+    key: "react",
+    title: "React",
+    minimum: "Build while learning",
+    principle: "Execution over tutorials.",
+    reinforcement: "A navbar built is worth more than a playlist finished."
+  },
+  {
+    key: "german",
+    title: "German",
+    minimum: "20 mins maintenance",
+    principle: "Protect continuity only.",
+    reinforcement: "Keep the streak alive, but do not let it steal the day."
+  }
+];
+
+export const SESSION_PRESETS = {
+  aptitude: {
+    key: "aptitude",
+    label: "Aptitude exposure set",
+    duration: 60
+  },
+  dsa: {
+    key: "dsa",
+    label: "DSA deep session",
+    duration: 45
+  },
+  react: {
+    key: "react",
+    label: "React build session",
+    duration: 45
+  },
+  german: {
+    key: "german",
+    label: "German continuity block",
+    duration: 20
+  },
+  recovery: {
+    key: "recovery",
+    label: "Recovery sprint",
+    duration: 15
+  },
+  low_energy: {
+    key: "low_energy",
+    label: "Low-energy restart",
+    duration: 5
+  }
+};
+
+export const RECOVERY_ACTIONS = {
+  standard: [
+    "Put phone away",
+    "10 pushups",
+    "15-minute focus sprint",
+    "Cold water splash",
+    "Silence mode",
+    "Walk without headphones"
+  ],
+  low_energy: [
+    "5-minute start",
+    "Open editor only",
+    "Solve 1 aptitude question",
+    "Revise notes only",
+    "Read one React section"
+  ]
+};
+
+export const REALITY_CHECK_LINES = [
+  "Avoidance increases fear.",
+  "Watching is not building.",
+  "You are protecting comfort, not the future."
+];
+
+export const DAILY_REALITY_OPTIONS = [
+  ["skills", "Skills"],
+  ["body", "Body"],
+  ["project", "Project"],
+  ["discipline", "Discipline"],
+  ["nothing", "Nothing"]
 ];
 
 export const GUIDE_SECTIONS = [
@@ -40,17 +133,17 @@ export const GUIDE_ROADMAP = [
   {
     title: "Next 30 days",
     kicker: "Reset window",
-    copy: "Wake early. Sleep before 11:30. Exercise daily. Complete one hard task every day. Reduce screen noise. Build daily. No porn. No late-night drifting. No fake fantasies."
+    copy: "Wake up, reduce noise, face aptitude, ship visible work, and do not let mood negotiate with duty. The first 30 days are where self-trust begins to rebuild."
   },
   {
     title: "What your life demands",
     kicker: "Structure over chaos",
-    copy: "Your life does not improve through comfort, fantasy, or one motivated burst. It improves when structure becomes normal. The more disciplined you become, the better your mind feels. The more chaotic you become, the more mentally destroyed you feel."
+    copy: "Your life does not improve through comfort, fantasy, or one motivated burst. It improves when structure becomes normal. The more disciplined you become, the better your mind feels."
   },
   {
     title: "500 boring days",
     kicker: "Real breakthrough",
-    copy: "Your breakthrough will not come from one big day, one tool, one course, or one idea. It will come from 500 boring days of consistent execution. Wake up. Show up. Do hard things. Finish work. Repeat."
+    copy: "Your breakthrough will not come from one big day, one tool, one course, or one idea. It will come from boring days of repeated execution. Show up, finish work, repeat."
   }
 ];
 
@@ -208,45 +301,4 @@ export const PAGE_TABS = [
   ["history", "History"],
   ["guide", "Guide"],
   ["settings", "Settings"]
-];
-
-export const STRICT_TASKS = [
-  {
-    key: "big_goal_completed",
-    title: "Big Goal complete",
-    description: "The one thing that makes today real."
-  },
-  {
-    key: "study_build_completed",
-    title: "Study / Build complete",
-    description: "Visible output over imagined productivity."
-  },
-  {
-    key: "exercise_completed",
-    title: "Exercise complete",
-    description: "Move the body before the mind weakens."
-  }
-];
-
-export const MINIMUM_DAY_TASKS = [
-  {
-    key: "minimum_build_completed",
-    title: "15 min build",
-    description: "One meaningful study/build action."
-  },
-  {
-    key: "minimum_pushups_completed",
-    title: "10 pushups",
-    description: "Move, even if motivation is low."
-  },
-  {
-    key: "minimum_no_porn_completed",
-    title: "No porn",
-    description: "Protect the mind from collapse."
-  },
-  {
-    key: "minimum_sleep_before_midnight_completed",
-    title: "Sleep before midnight",
-    description: "A cleaner reset for tomorrow."
-  }
 ];

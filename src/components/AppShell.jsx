@@ -20,10 +20,10 @@ export default function AppShell({
       <header className="topbar">
         <div className="topbar-inner">
           <div className="brand">
-            <div className="brand-mark" aria-hidden="true">S</div>
+            <div className="brand-mark brand-mark-devanagari" aria-hidden="true">सं</div>
             <div className="brand-copy">
-              <div className="brand-kicker">Personal system</div>
-              <div className="brand-title">The Steady Path</div>
+              <div className="brand-kicker">Sankalp</div>
+              <div className="brand-title brand-title-devanagari">संकल्प</div>
             </div>
           </div>
           <nav className="nav-strip desktop-nav-strip" aria-label="Pages">

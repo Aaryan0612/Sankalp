@@ -5,7 +5,7 @@ export default function SetupScreen() {
     <div className="setup-shell">
       <div className="setup-card">
         <div className="eyebrow">Deploy setup</div>
-        <h1 className="hero-title">The Steady Path needs Supabase before it can hold you accountable.</h1>
+        <h1 className="hero-title">Sankalp needs Supabase before it can hold you accountable.</h1>
         <p className="setup-copy">
           Create a <span className="mark">.env</span> file from <span className="line-mark">.env.example</span>, then add your public
           Supabase URL and anon key.

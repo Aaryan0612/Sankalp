@@ -15,18 +15,27 @@ create table if not exists public.daily_entries (
   big_goal_completed boolean not null default false,
   study_build_completed boolean not null default false,
   exercise_completed boolean not null default false,
+  aptitude_completed boolean not null default false,
+  primary_focus_type text not null default 'dsa' check (primary_focus_type in ('dsa', 'react')),
+  primary_focus_completed boolean not null default false,
+  secondary_continuity_type text not null default 'react' check (secondary_continuity_type in ('dsa', 'react')),
+  secondary_continuity_completed boolean not null default false,
+  german_completed boolean not null default false,
   sleep_time text,
   wake_time text,
   sleep_qualified boolean not null default false,
   silent_time_minutes integer not null default 0,
   walk_without_headphones_completed boolean not null default false,
   fantasy_detection_answer text check (fantasy_detection_answer in ('no', 'a_little', 'yes')),
+  daily_reality_check text default 'nothing' check (daily_reality_check in ('skills', 'body', 'project', 'discipline', 'nothing')),
   recovery_mode_used boolean not null default false,
+  recovery_tier text check (recovery_tier in ('standard', 'low_energy')),
   recovery_action_key text,
   proof_submitted boolean not null default false,
   reality_score integer not null default 0,
   minimum_viable_day_completed boolean not null default false,
   minimum_build_completed boolean not null default false,
+  minimum_study_sprint_completed boolean not null default false,
   minimum_pushups_completed boolean not null default false,
   minimum_no_porn_completed boolean not null default false,
   minimum_sleep_before_midnight_completed boolean not null default false,
@@ -37,6 +46,35 @@ create table if not exists public.daily_entries (
   updated_at timestamptz not null default now(),
   unique (user_id, date)
 );
+
+alter table public.daily_entries add column if not exists aptitude_completed boolean not null default false;
+alter table public.daily_entries add column if not exists primary_focus_type text not null default 'dsa';
+alter table public.daily_entries add column if not exists primary_focus_completed boolean not null default false;
+alter table public.daily_entries add column if not exists secondary_continuity_type text not null default 'react';
+alter table public.daily_entries add column if not exists secondary_continuity_completed boolean not null default false;
+alter table public.daily_entries add column if not exists german_completed boolean not null default false;
+alter table public.daily_entries add column if not exists daily_reality_check text default 'nothing';
+alter table public.daily_entries add column if not exists recovery_tier text;
+alter table public.daily_entries add column if not exists minimum_study_sprint_completed boolean not null default false;
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'daily_entries_primary_focus_type_check'
+  ) then
+    alter table public.daily_entries add constraint daily_entries_primary_focus_type_check check (primary_focus_type in ('dsa', 'react'));
+  end if;
+  if not exists (
+    select 1 from pg_constraint where conname = 'daily_entries_secondary_continuity_type_check'
+  ) then
+    alter table public.daily_entries add constraint daily_entries_secondary_continuity_type_check check (secondary_continuity_type in ('dsa', 'react'));
+  end if;
+  if not exists (
+    select 1 from pg_constraint where conname = 'daily_entries_recovery_tier_check'
+  ) then
+    alter table public.daily_entries add constraint daily_entries_recovery_tier_check check (recovery_tier in ('standard', 'low_energy'));
+  end if;
+end $$;
 
 create table if not exists public.daily_drift_logs (
   id uuid primary key default gen_random_uuid(),
@@ -65,10 +103,32 @@ create table if not exists public.streak_state (
   best_full_streak integer not null default 0,
   no_zero_day_streak integer not null default 0,
   identity_save_count integer not null default 0,
-  weekly_grace_available boolean not null default true,
+  weekly_grace_available boolean not null default false,
   weekly_grace_last_reset_date date,
   last_success_date date,
   updated_at timestamptz not null default now()
+);
+
+create table if not exists public.challenge_state (
+  user_id uuid primary key references public.profiles(id) on delete cascade,
+  challenge_start_date date not null default '2026-05-11',
+  challenge_day_number integer not null default 1,
+  strict_days_completed integer not null default 0,
+  saved_days integer not null default 0,
+  missed_days integer not null default 0,
+  status text not null default 'active' check (status in ('active', 'completed', 'reset')),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.planned_days (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  date date not null,
+  planned_big_goal_text text not null default '',
+  planning_note text default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, date)
 );
 
 create table if not exists public.reminder_preferences (
@@ -105,11 +165,23 @@ create trigger set_reminders_updated_at
 before update on public.reminder_preferences
 for each row execute procedure public.set_updated_at();
 
+drop trigger if exists set_challenge_state_updated_at on public.challenge_state;
+create trigger set_challenge_state_updated_at
+before update on public.challenge_state
+for each row execute procedure public.set_updated_at();
+
+drop trigger if exists set_planned_days_updated_at on public.planned_days;
+create trigger set_planned_days_updated_at
+before update on public.planned_days
+for each row execute procedure public.set_updated_at();
+
 alter table public.profiles enable row level security;
 alter table public.daily_entries enable row level security;
 alter table public.daily_drift_logs enable row level security;
 alter table public.proof_entries enable row level security;
 alter table public.streak_state enable row level security;
+alter table public.challenge_state enable row level security;
+alter table public.planned_days enable row level security;
 alter table public.reminder_preferences enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
@@ -136,6 +208,14 @@ for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 drop policy if exists "streak_state_own_all" on public.streak_state;
 create policy "streak_state_own_all" on public.streak_state
+for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "challenge_state_own_all" on public.challenge_state;
+create policy "challenge_state_own_all" on public.challenge_state
+for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+drop policy if exists "planned_days_own_all" on public.planned_days;
+create policy "planned_days_own_all" on public.planned_days
 for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
 drop policy if exists "reminder_preferences_own_all" on public.reminder_preferences;
