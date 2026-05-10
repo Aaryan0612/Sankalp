@@ -45,12 +45,47 @@ export function useSteadyPathApp() {
 
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (!mounted) return;
-      if (error) setBootError(error.message);
-      setSession(data.session || null);
-      setLoading(false);
-    });
+    async function bootstrapAuth() {
+      const currentUrl = new URL(window.location.href);
+      const authCode = currentUrl.searchParams.get("code");
+      const authError = currentUrl.searchParams.get("error_description") || currentUrl.searchParams.get("error");
+
+      try {
+        if (authError && mounted) {
+          setBootError(decodeURIComponent(authError));
+        }
+
+        if (authCode) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(authCode);
+          if (error) throw error;
+
+          if (mounted) {
+            setSession(data.session || null);
+          }
+
+          currentUrl.searchParams.delete("code");
+          currentUrl.searchParams.delete("error");
+          currentUrl.searchParams.delete("error_code");
+          currentUrl.searchParams.delete("error_description");
+          window.history.replaceState({}, document.title, currentUrl.pathname);
+        }
+
+        const { data, error } = await supabase.auth.getSession();
+        if (!mounted) return;
+        if (error) setBootError(error.message);
+        setSession(data.session || null);
+      } catch (error) {
+        if (!mounted) return;
+        setBootError(error.message || "Could not complete sign-in.");
+        setSession(null);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    bootstrapAuth();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
