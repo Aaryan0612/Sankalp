@@ -9,7 +9,7 @@ import {
   SESSION_PRESETS
 } from "../data/appContent";
 import { buildHistoryInsights, deriveTodayPresentation, getActiveMode, invertPrimaryFocus, mergeDerivedEntry } from "../lib/accountability";
-import { currentLocalHourBucket, displayDateForTimezone, isoDateForTimezone, timeNowForTimezone, weekdayForTimezone } from "../lib/date";
+import { currentLocalHourBucket, daysUntilBirthday, displayDateForTimezone, isoDateForTimezone, timeNowForTimezone, weekdayForTimezone } from "../lib/date";
 import { hasSupabaseConfig, supabase } from "../lib/supabase";
 import {
   getBootData,
@@ -30,6 +30,10 @@ function createDefaultSession(key) {
     ...preset,
     startedAt: Date.now()
   };
+}
+
+function buildBootCacheKey(userId) {
+  return `sankalp-boot-cache-${userId}`;
 }
 
 export function useSteadyPathApp() {
@@ -66,6 +70,23 @@ export function useSteadyPathApp() {
   const [sessionNote, setSessionNote] = useState("");
   const [sessionAttachProof, setSessionAttachProof] = useState(false);
   const reminderIntervalRef = useRef(null);
+
+  function applyBootData(data) {
+    setProfile(data.profile);
+    setEntry(data.entry);
+    setProofs(data.proofs);
+    setDriftLogs(data.driftLogs);
+    setDriftHistory(data.driftHistory);
+    setSelectedDrifts(new Set(data.driftLogs.map((item) => item.drift_trigger)));
+    setHistory(data.history);
+    setStreak(data.streak);
+    setChallenge(data.challenge);
+    setReminders(data.reminders);
+    setTodayPlan(data.todayPlan);
+    setTomorrowPlan(data.tomorrowPlan);
+    setPlannedBigGoalText(data.tomorrowPlan?.planned_big_goal_text || "");
+    setPlanningNote(data.tomorrowPlan?.planning_note || "");
+  }
 
   useEffect(() => {
     document.body.classList.toggle("theme-light", theme === "light");
@@ -138,24 +159,31 @@ export function useSteadyPathApp() {
     let cancelled = false;
 
     async function load() {
+      const cacheKey = buildBootCacheKey(session.user.id);
+      const cachedRaw = window.localStorage.getItem(cacheKey);
+      let hasHydratedFromCache = false;
+
+      if (cachedRaw) {
+        try {
+          const cached = JSON.parse(cachedRaw);
+          if (!cancelled && cached?.entry && cached?.profile) {
+            applyBootData(cached);
+            setLoading(false);
+            hasHydratedFromCache = true;
+          }
+        } catch {
+          window.localStorage.removeItem(cacheKey);
+        }
+      }
+
       try {
-        setLoading(true);
+        if (!hasHydratedFromCache) {
+          setLoading(true);
+        }
         const data = await getBootData(session.user);
         if (cancelled) return;
-        setProfile(data.profile);
-        setEntry(data.entry);
-        setProofs(data.proofs);
-        setDriftLogs(data.driftLogs);
-        setDriftHistory(data.driftHistory);
-        setSelectedDrifts(new Set(data.driftLogs.map((item) => item.drift_trigger)));
-        setHistory(data.history);
-        setStreak(data.streak);
-        setChallenge(data.challenge);
-        setReminders(data.reminders);
-        setTodayPlan(data.todayPlan);
-        setTomorrowPlan(data.tomorrowPlan);
-        setPlannedBigGoalText(data.tomorrowPlan?.planned_big_goal_text || "");
-        setPlanningNote(data.tomorrowPlan?.planning_note || "");
+        applyBootData(data);
+        window.localStorage.setItem(cacheKey, JSON.stringify(data));
       } catch (error) {
         if (!cancelled) {
           setBootError(error.message || "Failed to load app.");
@@ -215,6 +243,10 @@ export function useSteadyPathApp() {
   const profileName = profile?.display_name || session?.user?.email?.split("@")[0] || "User";
   const dayPart = currentLocalHourBucket(profile?.timezone);
   const historyInsights = useMemo(() => buildHistoryInsights(history), [history]);
+  const birthdayCountdown = useMemo(() => {
+    if (!profile?.timezone) return null;
+    return daysUntilBirthday(profile.timezone, 12, 6);
+  }, [profile?.timezone]);
 
   const driftTrend = useMemo(() => {
     const counts = Object.fromEntries(DRIFT_TRIGGERS.map((item) => [item.key, 0]));
@@ -279,8 +311,24 @@ export function useSteadyPathApp() {
       setChallenge(nextProgress.challenge);
       setHistory((current) => {
         const filtered = current.filter((item) => item.date !== merged.date);
-        return [merged, ...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 60);
+        return [merged, ...filtered].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 400);
       });
+      if (session?.user?.id) {
+        const cacheKey = buildBootCacheKey(session.user.id);
+        window.localStorage.setItem(cacheKey, JSON.stringify({
+          profile,
+          entry: merged,
+          proofs,
+          driftLogs,
+          driftHistory,
+          history: [merged, ...history.filter((item) => item.date !== merged.date)].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 400),
+          streak: nextProgress.streak,
+          challenge: nextProgress.challenge,
+          reminders,
+          todayPlan,
+          tomorrowPlan
+        }));
+      }
       setSaveState("saved");
       window.setTimeout(() => setSaveState("idle"), 1200);
       return merged;
@@ -366,6 +414,18 @@ export function useSteadyPathApp() {
         display_name: displayName.trim() || "User"
       });
       setProfile(nextProfile);
+      if (session?.user?.id) {
+        const cacheKey = buildBootCacheKey(session.user.id);
+        const cachedRaw = window.localStorage.getItem(cacheKey);
+        if (cachedRaw) {
+          try {
+            const cached = JSON.parse(cachedRaw);
+            window.localStorage.setItem(cacheKey, JSON.stringify({ ...cached, profile: nextProfile }));
+          } catch {
+            // ignore cache errors
+          }
+        }
+      }
       setBannerMessage("Name updated.");
     } catch (error) {
       setBannerMessage(error.message || "Could not update profile.");
@@ -522,6 +582,9 @@ export function useSteadyPathApp() {
 
   async function signOut() {
     await supabase.auth.signOut();
+    if (session?.user?.id) {
+      window.localStorage.removeItem(buildBootCacheKey(session.user.id));
+    }
     setSession(null);
     setProfile(null);
     setEntry(null);
@@ -548,6 +611,7 @@ export function useSteadyPathApp() {
     authMessage,
     activePage,
     setActivePage,
+    birthdayCountdown,
     profile,
     profileName,
     dayPart,

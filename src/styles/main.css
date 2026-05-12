@@ -364,6 +364,26 @@ body:not(.theme-light) .brand-title-devanagari {
   transition: 180ms ease;
 }
 
+.log-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  border: none;
+  color: white;
+  background: var(--blue);
+  box-shadow: 0 10px 24px rgba(86, 69, 212, 0.22);
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.log-action-btn.active,
+.log-action-btn:hover {
+  background: var(--blue-2);
+}
+
 .nav-pill-icon,
 .theme-toggle,
 .ghost-btn,
@@ -426,6 +446,11 @@ body:not(.theme-light) .brand-title-devanagari {
   margin-bottom: 18px;
 }
 
+.compact-banner-stack {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+
 .banner,
 .panel,
 .guide-card,
@@ -456,14 +481,17 @@ body:not(.theme-light) .banner {
 
 .page-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.74fr);
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 360px);
   gap: 20px;
+  align-items: start;
 }
 
 .main-stack,
 .side-stack {
   display: grid;
   gap: 20px;
+  align-content: start;
+  align-items: start;
 }
 
 .panel {
@@ -523,7 +551,7 @@ body:not(.theme-light) .banner {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
   gap: 22px;
   align-items: start;
 }
@@ -552,6 +580,14 @@ body:not(.theme-light) .banner {
   border-bottom: none;
 }
 
+.hero-note-focus {
+  display: grid;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .hero-copy,
 .section-copy,
 .task-info span,
@@ -573,6 +609,11 @@ body:not(.theme-light) .banner {
 .trend-grid {
   display: grid;
   gap: 16px;
+}
+
+.score-band-compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
 }
 
 .stats-grid {
@@ -609,6 +650,7 @@ body:not(.theme-light) .banner {
 
 .dashboard-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
 }
 
 .field-grid {
@@ -729,6 +771,13 @@ body:not(.theme-light) .banner {
   flex-wrap: wrap;
 }
 
+.range-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 14px;
+}
+
 .inline-badge {
   width: fit-content;
   margin-top: 14px;
@@ -748,6 +797,15 @@ body:not(.theme-light) .banner {
 
 .settings-actions {
   align-items: end;
+}
+
+.log-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.log-hero {
+  padding: 22px 20px;
 }
 
 .profile-grid {
@@ -967,7 +1025,7 @@ body:not(.theme-light) .banner {
 
 .guide-lists-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
 }
 
@@ -1142,7 +1200,8 @@ body:not(.theme-light) .tone-neutral {
 }
 
 .dashboard-grid-wide {
-  grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(340px, 0.94fr) minmax(0, 1.06fr);
+  align-items: start;
 }
 
 .exam-task-grid,
@@ -1152,7 +1211,7 @@ body:not(.theme-light) .tone-neutral {
 }
 
 .exam-task-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .exam-task-card {
@@ -1209,7 +1268,7 @@ body:not(.theme-light) .tone-neutral {
 
 .supportive-grid {
   display: grid;
-  grid-template-columns: minmax(160px, 0.7fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -1239,6 +1298,12 @@ body:not(.theme-light) .tone-neutral {
 .grounding-label {
   color: var(--text);
   font-weight: 700;
+  white-space: nowrap;
+}
+
+.grounding-label::after {
+  content: ":";
+  margin-left: 0.16em;
 }
 
 .grounding-value {
@@ -1358,6 +1423,10 @@ body:not(.theme-light) .tone-neutral {
 }
 
 @media (max-width: 1360px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero-grid {
     grid-template-columns: 1fr;
   }
@@ -1368,11 +1437,7 @@ body:not(.theme-light) .tone-neutral {
   }
 
   .hero-note {
-    max-width: 720px;
-  }
-
-  .exam-task-grid {
-    grid-template-columns: 1fr;
+    max-width: 760px;
   }
 
   .dashboard-grid-wide {
@@ -1380,6 +1445,10 @@ body:not(.theme-light) .tone-neutral {
   }
 
   .supportive-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guide-lists-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1444,6 +1513,10 @@ body:not(.theme-light) .tone-neutral {
 
   .ritual-grid,
   .guide-lists-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .score-band-compact {
     grid-template-columns: 1fr;
   }
 }
@@ -1580,5 +1653,9 @@ body:not(.theme-light) .tone-neutral {
     color: white;
     background: var(--blue);
     box-shadow: 0 10px 24px rgba(86, 69, 212, 0.22);
+  }
+
+  .mobile-tab-plus {
+    font-weight: 700;
   }
 }

@@ -3,6 +3,7 @@ import AuthScreen from "./components/AuthScreen";
 import GuidePage from "./components/GuidePage";
 import HistoryPage from "./components/HistoryPage";
 import LoadingScreen from "./components/LoadingScreen";
+import LogPage from "./components/LogPage";
 import SettingsPage from "./components/SettingsPage";
 import SetupScreen from "./components/SetupScreen";
 import TodayPage from "./components/TodayPage";
@@ -42,17 +43,33 @@ export default function App() {
       setTheme={app.setTheme}
       activePage={app.activePage}
       setActivePage={app.setActivePage}
+      openLog={() => app.setActivePage("log")}
     >
       {app.activePage === "today" && app.entry ? (
         <TodayPage
           profileName={app.profileName}
           dayPart={app.dayPart}
           displayDate={app.displayDate}
-          saveState={app.saveState}
+          birthdayCountdown={app.birthdayCountdown}
           bannerMessage={app.bannerMessage}
           setBannerMessage={app.setBannerMessage}
           todayState={app.todayState}
           streak={app.streak}
+          challenge={app.challenge}
+          proofs={app.proofs}
+          guidance={app.guidance}
+          requestNotifications={app.requestNotifications}
+          mode={app.mode}
+          openLog={() => app.setActivePage("log")}
+          tomorrowPlan={app.tomorrowPlan}
+        />
+      ) : null}
+
+      {app.activePage === "log" && app.entry ? (
+        <LogPage
+          saveState={app.saveState}
+          bannerMessage={app.bannerMessage}
+          todayState={app.todayState}
           entry={app.entry}
           setEntry={app.setEntry}
           persistEntry={app.persistEntry}
@@ -68,10 +85,7 @@ export default function App() {
           setProofFile={app.setProofFile}
           handleProofSubmit={app.handleProofSubmit}
           proofs={app.proofs}
-          guidance={app.guidance}
-          requestNotifications={app.requestNotifications}
           mode={app.mode}
-          currentTime={app.currentTime}
           currentSession={app.currentSession}
           beginSession={app.beginSession}
           completeSession={app.completeSession}
@@ -90,14 +104,15 @@ export default function App() {
           selectRecoveryAction={app.selectRecoveryAction}
           realityCheckLine={app.realityCheckLine}
           recoveryActions={app.recoveryActions}
+          requestNotifications={app.requestNotifications}
         />
       ) : null}
 
       {app.activePage === "history" && app.entry ? (
         <HistoryPage
+          history={app.history}
           recentSummary={app.recentSummary}
           streak={app.streak}
-          history={app.history}
           driftTrend={app.driftTrend}
           challenge={app.challenge}
           historyInsights={app.historyInsights}

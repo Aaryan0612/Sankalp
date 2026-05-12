@@ -159,7 +159,7 @@ export async function getBootData(user) {
   ] = await Promise.all([
     supabase.from("proof_entries").select("*").eq("user_id", user.id).eq("date", today).order("created_at", { ascending: false }),
     supabase.from("daily_drift_logs").select("*").eq("user_id", user.id).eq("date", today),
-    supabase.from("daily_entries").select("*").eq("user_id", user.id).order("date", { ascending: false }).limit(60),
+    supabase.from("daily_entries").select("*").eq("user_id", user.id).order("date", { ascending: false }).limit(400),
     supabase.from("streak_state").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("reminder_preferences").select("*").eq("user_id", user.id).maybeSingle(),
     supabase.from("daily_drift_logs").select("*").eq("user_id", user.id).gte("date", sinceDate),
@@ -220,7 +220,7 @@ export async function recomputeProgressState({ session, profile, nextEntry, proo
     .select("*")
     .eq("user_id", session.user.id)
     .order("date", { ascending: false })
-    .limit(120);
+    .limit(400);
 
   const historyRows = rows.data || [];
 

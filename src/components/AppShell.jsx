@@ -1,4 +1,4 @@
-import { BookOpen, History, LayoutDashboard, MoonStar, Settings, SunMedium } from "lucide-react";
+import { BookOpen, History, LayoutDashboard, MoonStar, Plus, Settings, SunMedium } from "lucide-react";
 import { PAGE_TABS } from "../data/appContent";
 
 export default function AppShell({
@@ -6,6 +6,7 @@ export default function AppShell({
   setTheme,
   activePage,
   setActivePage,
+  openLog,
   children
 }) {
   const tabIcons = {
@@ -39,6 +40,14 @@ export default function AppShell({
           </nav>
           <div className="action-row">
             <button
+              className={`log-action-btn ${activePage === "log" ? "active" : ""}`}
+              type="button"
+              aria-label="Open daily log"
+              onClick={openLog}
+            >
+              <Plus size={18} strokeWidth={2.4} />
+            </button>
+            <button
               className="theme-icon-btn"
               type="button"
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
@@ -52,6 +61,13 @@ export default function AppShell({
       <main className="page">{children}</main>
       <nav className="mobile-bottom-nav" aria-label="Mobile pages">
         <div className="mobile-bottom-nav-inner">
+          <button
+            className={`mobile-tab mobile-tab-plus ${activePage === "log" ? "active" : ""}`}
+            onClick={openLog}
+          >
+            <Plus size={17} strokeWidth={2.4} />
+            <span>Log</span>
+          </button>
           {PAGE_TABS.map(([key, label]) => {
             const Icon = tabIcons[key];
             return (

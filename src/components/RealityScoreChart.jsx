@@ -12,11 +12,18 @@ function buildPath(points, width, height, padding) {
     .join(" ");
 }
 
-export default function RealityScoreChart({ points = [] }) {
+function formatLabel(date, rangeKey) {
+  if (rangeKey === "7d") return date.slice(5);
+  if (rangeKey === "30d") return date.slice(5);
+  return `${date.slice(2, 4)}/${date.slice(5, 7)}`;
+}
+
+export default function RealityScoreChart({ points = [], rangeKey = "30d" }) {
   const width = 760;
   const height = 240;
   const padding = 20;
   const path = buildPath(points, width, height, padding);
+  const labelStep = rangeKey === "7d" ? 1 : rangeKey === "30d" ? 3 : rangeKey === "6m" ? 5 : 8;
 
   return (
     <div className="chart-shell">
@@ -37,9 +44,11 @@ export default function RealityScoreChart({ points = [] }) {
           return (
             <g key={`${point.date}-${index}`}>
               <circle cx={x} cy={y} r="5" className="chart-point" />
-              <text x={x} y={height - 2} textAnchor="middle" className="chart-date-label">
-                {point.date.slice(5)}
-              </text>
+              {index % labelStep === 0 || index === points.length - 1 ? (
+                <text x={x} y={height - 2} textAnchor="middle" className="chart-date-label">
+                  {formatLabel(point.date, rangeKey)}
+                </text>
+              ) : null}
             </g>
           );
         })}

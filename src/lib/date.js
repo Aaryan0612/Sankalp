@@ -77,3 +77,17 @@ export function timeNowForTimezone(timezone) {
     hour12: false
   }).format(new Date());
 }
+
+export function daysUntilBirthday(timezone, month, day, date = new Date()) {
+  const todayIso = isoDateForTimezone(timezone, date);
+  const [year] = todayIso.split("-").map(Number);
+  const candidateThisYear = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const target = todayIso <= candidateThisYear ? candidateThisYear : `${year + 1}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return Math.max(0, dateDiffIso(todayIso, target));
+}
+
+export function dateDiffIso(startDate, endDate) {
+  const start = parseIsoDate(startDate).getTime();
+  const end = parseIsoDate(endDate).getTime();
+  return Math.floor((end - start) / 86400000);
+}

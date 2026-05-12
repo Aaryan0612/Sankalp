@@ -1,4 +1,5 @@
-import { BarChart3, Flame, RotateCcw, ShieldCheck, TrendingUp } from "lucide-react";
+import { useMemo, useState } from "react";
+import { BarChart3, Flame, RotateCcw, ShieldCheck } from "lucide-react";
 import { DRIFT_TRIGGERS } from "../data/appContent";
 import RealityScoreChart from "./RealityScoreChart";
 
@@ -9,8 +10,37 @@ const OUTCOME_LABELS = {
   miss: "Miss"
 };
 
-export default function HistoryPage({ streak, challenge, driftTrend, historyInsights }) {
-  const timeline = historyInsights?.recentTimeline || [];
+const RANGE_OPTIONS = [
+  { key: "7d", label: "7 days", days: 7 },
+  { key: "30d", label: "30 days", days: 30 },
+  { key: "6m", label: "6 months", days: 183 },
+  { key: "1y", label: "1 year", days: 366 }
+];
+
+function filterHistoryByDays(history, days) {
+  const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date));
+  return sorted.slice(-days);
+}
+
+export default function HistoryPage({ streak, challenge, driftTrend, historyInsights, history }) {
+  const [range, setRange] = useState("30d");
+  const rangeDays = RANGE_OPTIONS.find((item) => item.key === range)?.days || 30;
+  const filteredHistory = useMemo(() => filterHistoryByDays(history || [], rangeDays), [history, rangeDays]);
+  const timeline = useMemo(
+    () =>
+      filteredHistory.map((row) => ({
+        date: row.date,
+        realityScore: row.reality_score || 0,
+        outcome: row.full_day_completed
+          ? "full_success"
+          : row.minimum_viable_day_completed
+            ? "saved"
+            : row.no_zero_day_completed
+              ? "no_zero"
+              : "miss"
+      })),
+    [filteredHistory]
+  );
 
   return (
     <div className="page-grid">
@@ -50,7 +80,18 @@ export default function HistoryPage({ streak, challenge, driftTrend, historyInsi
           <div className="section-label">Compounding</div>
           <h2 className="section-title">Reality score trend</h2>
           <p className="section-copy">This line should rise as execution becomes normal and drift loses ground.</p>
-          <RealityScoreChart points={timeline} />
+          <div className="range-tabs">
+            {RANGE_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                className={`chip secondary ${range === option.key ? "selected" : ""}`}
+                onClick={() => setRange(option.key)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <RealityScoreChart points={timeline} rangeKey={range} />
         </section>
 
         <section className="panel tone-neutral">
@@ -82,7 +123,7 @@ export default function HistoryPage({ streak, challenge, driftTrend, historyInsi
 
         <section className="panel tone-sky">
           <div className="section-label">Timeline</div>
-          <h2 className="section-title">See exactly what the last 30 days were.</h2>
+          <h2 className="section-title">See exactly what the last {RANGE_OPTIONS.find((item) => item.key === range)?.label.toLowerCase()} were.</h2>
           <div className="timeline-grid">
             {timeline.map((item) => (
               <div key={item.date} className={`timeline-chip ${item.outcome}`}>
